@@ -2,16 +2,26 @@ package com.pdsu.banmeng.config;
 
 import com.pdsu.banmeng.shiro.WebCookieRememberMeManager;
 import com.pdsu.banmeng.shiro.WebSessionManager;
+import com.pdsu.banmeng.utils.DateUtils;
 import org.apache.shiro.mgt.RememberMeManager;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.crazycake.shiro.RedisCacheManager;
+import org.crazycake.shiro.RedisManager;
+import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 
 import java.util.HashMap;
@@ -24,20 +34,82 @@ import java.util.Map;
  */
 @Configuration
 @SuppressWarnings("all")
-public class ShiroConfig implements ApplicationContextAware {
+public class ShiroConfig {
 
-    private ApplicationContext applicaiton;
+    @Value("${spring.redis.password}")
+    private String redisPassword;
 
     @Bean
     public RememberMeManager rememberMeManager() {
         return new WebCookieRememberMeManager();
     }
 
+    /**
+     * RedisSessionDAO shiro sessionDao层的实现 通过redis, 使用的是shiro-redis开源插件
+     *
+     * @return RedisSessionDAO
+     */
     @Bean
-    public SessionsSecurityManager webSecurityManager() throws Exception {
-        DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager(this.applicaiton.getBean(Realm.class));
-        defaultWebSecurityManager.setSessionManager(new WebSessionManager());
-        defaultWebSecurityManager.setRememberMeManager(this.applicaiton.getBean(RememberMeManager.class));
+    public RedisSessionDAO redisSessionDAO(JavaUuidSessionIdGenerator generator) {
+        RedisSessionDAO redisSessionDAO = new RedisSessionDAO();
+        redisSessionDAO.setRedisManager(redisManager());
+        redisSessionDAO.setSessionIdGenerator(generator);
+        redisSessionDAO.setExpire((int) DateUtils.NEWS_TIME_WEEK);
+        return redisSessionDAO;
+    }
+
+    /**
+     * 配置shiro redisManager, 使用的是shiro-redis开源插件
+     *
+     * @return RedisManager
+     */
+    private RedisManager redisManager() {
+        RedisManager redisManager = new RedisManager();
+        redisManager.setHost("localhost:6379");
+        redisManager.setPassword(redisPassword);
+        redisManager.setTimeout((int) DateUtils.NEWS_TIME_WEEK);
+        return redisManager;
+    }
+
+
+    /**
+     * cacheManager 缓存 redis实现, 使用的是shiro-redis开源插件
+     *
+     * @return RedisCacheManager
+     */
+    @Bean
+    public RedisCacheManager redisCacheManager() {
+        RedisCacheManager redisCacheManager = new RedisCacheManager();
+        redisCacheManager.setRedisManager(redisManager());
+        // 必须要设置主键名称，shiro-redis 插件用过这个缓存用户信息
+        redisCacheManager.setPrincipalIdFieldName("id");
+        return redisCacheManager;
+    }
+
+    /**
+     * Session ID 生成器
+     *
+     * @return JavaUuidSessionIdGenerator
+     */
+    @Bean
+    public JavaUuidSessionIdGenerator sessionIdGenerator() {
+        return new JavaUuidSessionIdGenerator();
+    }
+
+    @Bean
+    public SessionManager sessionManager(RedisSessionDAO sessionDAO) {
+        WebSessionManager webSessionManager = new WebSessionManager();
+        webSessionManager.setSessionDAO(sessionDAO);
+        return webSessionManager;
+    }
+
+    @Bean
+    public SessionsSecurityManager webSecurityManager(SessionManager sessionManager
+            , RedisCacheManager cacheManager, Realm realm, RememberMeManager rememberMeManager) throws Exception {
+        DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager(realm);
+        defaultWebSecurityManager.setSessionManager(sessionManager);
+        defaultWebSecurityManager.setRememberMeManager(rememberMeManager);
+        defaultWebSecurityManager.setCacheManager(cacheManager);
         return defaultWebSecurityManager;
     }
 
@@ -52,11 +124,6 @@ public class ShiroConfig implements ApplicationContextAware {
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
         return shiroFilterFactoryBean;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicaiton = applicationContext;
     }
 
 }

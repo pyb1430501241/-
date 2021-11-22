@@ -1,3 +1,5 @@
+debug: true
+
 server:
   port: 80
   servlet:
@@ -83,3 +85,8 @@ hystrix:
 ribbon:
   ReadTimeout: 5000
   SocketTimeout: 5000
+
+mybatis-plus:
+  type-enums-package: com.pdsu.banmeng.enmus
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

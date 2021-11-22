@@ -61,3 +61,8 @@ info:
   company.name: www.halfdream.cn/半梦的个人网址
   build.artifactId: ${project.artifactId}
   build.version: ${project.version}
+
+mybatis-plus:
+  type-enums-package: com.pdsu.banmeng.enmus
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

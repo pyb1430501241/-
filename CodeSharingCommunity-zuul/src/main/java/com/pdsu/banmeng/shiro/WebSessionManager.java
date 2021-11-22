@@ -2,6 +2,7 @@ package com.pdsu.banmeng.shiro;
 
 import com.pdsu.banmeng.utils.HttpUtils;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.servlet.SimpleCookie;
@@ -18,7 +19,7 @@ import java.io.Serializable;
  * @author 半梦
  *
  */
-@Log4j2
+@Slf4j
 public class WebSessionManager extends DefaultWebSessionManager {
 
 	private static final String REFERENCED_SESSION_ID_SOURCE  = "Stateless request";
@@ -26,6 +27,7 @@ public class WebSessionManager extends DefaultWebSessionManager {
 	@SuppressWarnings("all")
 	public WebSessionManager() {
 		Cookie cookie = new SimpleCookie(HttpUtils.getSessionHeader());
+		cookie.setPath("/");
 		log.info("系统初始化...Shiro认证cookie名为: " + cookie.getName());
 		cookie.setHttpOnly(false);
 		log.info("系统初始化...Shiro认证cookie是否为仅 Http 可见: " + cookie.isHttpOnly());
@@ -39,12 +41,14 @@ public class WebSessionManager extends DefaultWebSessionManager {
 	@Override
 	public Serializable getSessionId(ServletRequest request, ServletResponse response) {
 		String sessionId = HttpUtils.getSessionId(WebUtils.toHttp(request));
+
 		if(!StringUtils.hasText(sessionId)) {
 			request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_SOURCE, REFERENCED_SESSION_ID_SOURCE);
 			request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID, sessionId);
 			request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_IS_VALID, Boolean.TRUE);
 			return sessionId;
 		}
+
 		return super.getSessionId(request, response);
 	}
 

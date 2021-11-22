@@ -31,7 +31,13 @@ public abstract class ShiroUtils {
 	public static CurrentUser getCurrentUser() {
         Subject subject = SecurityUtils.getSubject();
         //取出身份信息
-        return (CurrentUser) subject.getPrincipal();
+        CurrentUser currentUser = (CurrentUser) subject.getPrincipal();
+
+        if(Objects.nonNull(currentUser)) {
+            currentUser.setPassword(null);
+        }
+
+        return currentUser;
 	}
 
     /**

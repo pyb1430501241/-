@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author 半梦
@@ -19,27 +21,20 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CorsConfig {
 
-    /**
-     * 跨域
-     */
     @Bean
-    public CorsConfiguration buildConfig() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.addAllowedMethod("POST");
-        corsConfiguration.addAllowedMethod("OPTIONS");
-        corsConfiguration.addAllowedMethod("GET");
-        corsConfiguration.addExposedHeader(HttpUtils.getSessionHeader());
-        corsConfiguration.setAllowCredentials(true);
-        return corsConfiguration;
-    }
-
-    @Bean
-    public CorsFilter corsFilter(CorsConfiguration configuration) {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); //注册
-        return new CorsFilter(source);
+    public WebMvcConfigurer webMvcConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")	// 允许跨域访问的路径
+                        .allowedOrigins("http:localhost")	// 允许跨域访问的源
+                        .allowedMethods("GET", "POST", "OPTIONS")
+                        .maxAge(60)	// 预检间隔时间
+                        .allowedHeaders("authorization") // 允许头部设置
+                        .exposedHeaders()
+                        .allowCredentials(Boolean.TRUE);	// 是否发送cookie
+            }
+        };
     }
 
 }

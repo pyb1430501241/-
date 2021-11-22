@@ -1,10 +1,13 @@
 package com.pdsu.banmeng.context;
 
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.pdsu.banmeng.enums.RoleEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.io.Serializable;
 
 /**
  * @author 半梦
@@ -15,13 +18,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class CurrentUser {
+@EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CurrentUser implements Serializable {
 
     private Integer id;
 
-    private String username;
+    private Integer uid;
 
     private String password;
+
+    private String username;
 
     private RoleEnum roleEnum;
 
