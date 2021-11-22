@@ -10,11 +10,11 @@
     <version>1.0.0</version>
 
     <modules>
-        <module>CodeSharingCommunity_rest</module>
-        <module>CodeSharingCommunity_core</module>
-        <module>CodeSharingCommunity_eureka</module>
-        <module>CodeSharingCommunity_zuul</module>
-        <module>CodeSharingCommunity_config_server</module>
+        <module>CodeSharingCommunity-rest</module>
+        <module>CodeSharingCommunity-core</module>
+        <module>CodeSharingCommunity-eureka</module>
+        <module>CodeSharingCommunity-zuul</module>
+        <module>CodeSharingCommunity-ConfigServer</module>
     </modules>
 
     <dependencyManagement>
@@ -26,7 +26,7 @@
             </dependency>
             <dependency>
                 <groupId>com.pdsu.banmeng</groupId>
-                <artifactId>CodeSharingCommunity_core</artifactId>
+                <artifactId>CodeSharingCommunity-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -266,11 +266,6 @@
                 <version>4.10.0.201712302008-r</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>5.3.1</version>
-            </dependency>
-            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
                 <version>2.3.5.RELEASE</version>
@@ -297,18 +292,18 @@
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>
-                <artifactId>springfox-bean-validators</artifactId>
-                <version>2.9.0</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>2.9.0</version>
+                <artifactId>springfox-boot-starter</artifactId>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.xiaobao.stp</groupId>
                 <artifactId>mybatis-plus-generator-plus</artifactId>
                 <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.78</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
