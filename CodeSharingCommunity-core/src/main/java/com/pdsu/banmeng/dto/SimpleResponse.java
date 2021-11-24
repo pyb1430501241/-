@@ -36,4 +36,10 @@ public class SimpleResponse<T> {
         this.msg = statusEnum.getMsg();
     }
 
+    public SimpleResponse(T data, StatusEnum statusEnum) {
+        this.data = data;
+        this.code = statusEnum.getCode();
+        this.msg = statusEnum.getMsg();
+    }
+
 }

@@ -51,10 +51,8 @@ public abstract class AbstractAuthenticationAspect {
         // 结合游客级方法已放行, 如果用户未登录, 则直接认为无权限
         Assert.nonNull(currentUser, StatusEnum.NOT_LOGIN);
 
-        System.out.println(currentUser);
-
         // 如果该方法允许此用户所拥有的角色访问，则放行
-        if(roles.contains(currentUser.getRoleEnum())) {
+        if(roles.contains(currentUser.getRole())) {
             return;
         }
 

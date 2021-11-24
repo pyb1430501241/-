@@ -63,12 +63,11 @@ zuul:
   ignored-services: '*'
   add-proxy-headers: true
   add-host-header: true
-  prefix: /api
   routes:
     CodeSharingCommunityRest:
-      path: /rest/**
+      path: /**
       service-id: CodeSharingCommunityRest
-  ignored-patterns: /login, /logout, /nav
+  ignored-patterns: /login, /logout, /nav, /applyCode, /applyAccount
 info:
   app.name: CodeSharingCommunity_路由网关_01
   company.name: www.halfdream.cn/半梦的个人网址
@@ -87,6 +86,6 @@ ribbon:
   SocketTimeout: 5000
 
 mybatis-plus:
-  type-enums-package: com.pdsu.banmeng.enmus
+  type-enums-package: com.pdsu.banmeng.enums
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

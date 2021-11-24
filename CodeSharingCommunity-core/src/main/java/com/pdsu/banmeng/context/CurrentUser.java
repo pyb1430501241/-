@@ -30,6 +30,10 @@ public class CurrentUser implements Serializable {
 
     private String username;
 
-    private RoleEnum roleEnum;
+    private String imgPath;
+
+    private String email;
+
+    private RoleEnum role;
 
 }

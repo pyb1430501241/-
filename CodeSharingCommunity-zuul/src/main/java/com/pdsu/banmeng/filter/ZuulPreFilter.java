@@ -36,7 +36,7 @@ public class ZuulPreFilter extends ZuulFilter {
 
     @Override
     public Object run() throws ZuulException {
-        CurrentUser currentUser = ShiroUtils.getCurrentUser();
+        CurrentUser currentUser = ShiroUtils.currentUser();
 
         // 如果没有登录, 则直接转发
         if(Objects.isNull(currentUser)) {

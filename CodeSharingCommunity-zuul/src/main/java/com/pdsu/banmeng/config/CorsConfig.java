@@ -27,7 +27,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")	// 允许跨域访问的路径
-                        .allowedOrigins("http:localhost")	// 允许跨域访问的源
+                        .allowedOrigins("http://localhost:8080")	// 允许跨域访问的源
                         .allowedMethods("GET", "POST", "OPTIONS")
                         .maxAge(60)	// 预检间隔时间
                         .allowedHeaders("authorization") // 允许头部设置

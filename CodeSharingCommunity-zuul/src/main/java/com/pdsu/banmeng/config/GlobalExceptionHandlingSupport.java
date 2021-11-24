@@ -24,6 +24,7 @@ public class GlobalExceptionHandlingSupport {
      */
     @ExceptionHandler(AuthenticationException.class)
     public SimpleResponse<String> processAuthenticationException(AuthenticationException e) {
+
         if(e instanceof IncorrectCredentialsException) {
             log.info("用户登录时出现未知错误, 原因: 账号或密码错误");
             return new SimpleResponse<>("账号或密码错误");
@@ -34,6 +35,7 @@ public class GlobalExceptionHandlingSupport {
             log.info("用户登录时出现未知错误, 原因: " + e.getMessage());
             return new SimpleResponse<>(e.getMessage());
         }
+
         log.info("用户登录时出现未知错误, 原因: " + e.getMessage());
         SecurityUtils.getSubject().logout();
         return new SimpleResponse<>("网络异常");

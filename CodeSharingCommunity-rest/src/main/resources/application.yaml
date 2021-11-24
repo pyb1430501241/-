@@ -63,6 +63,6 @@ info:
   build.version: ${project.version}
 
 mybatis-plus:
-  type-enums-package: com.pdsu.banmeng.enmus
+  type-enums-package: com.pdsu.banmeng.enums
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

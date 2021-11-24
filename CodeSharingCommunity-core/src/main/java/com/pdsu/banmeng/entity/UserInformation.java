@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.pdsu.banmeng.enums.AccountStatusEnum;
 import lombok.*;
 
 /**
@@ -50,7 +51,7 @@ public class UserInformation implements Serializable {
     /**
      * 账号状态
      */
-    private AccountStatus accountStatus;
+    private AccountStatusEnum accountStatus;
 
     /**
      * 申请时间

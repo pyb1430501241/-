@@ -2,10 +2,6 @@ package com.pdsu.banmeng.aspect;
 
 import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.utils.ShiroUtils;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -39,7 +35,7 @@ public class AuthenticationAspect extends AbstractAuthenticationAspect{
 
     @Override
     public CurrentUser currentUser() {
-        return ShiroUtils.getCurrentUser();
+        return ShiroUtils.currentUser();
     }
 
 }

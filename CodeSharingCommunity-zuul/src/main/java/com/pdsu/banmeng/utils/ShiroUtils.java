@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 public abstract class ShiroUtils {
 
     @Nullable
-	public static CurrentUser getCurrentUser() {
+	public static CurrentUser currentUser() {
         Subject subject = SecurityUtils.getSubject();
         //取出身份信息
         CurrentUser currentUser = (CurrentUser) subject.getPrincipal();
@@ -87,7 +87,7 @@ public abstract class ShiroUtils {
      * @return
      */
     @Nullable
-    public static CurrentUser getCurrentUser(@Nullable String sessionID, HttpServletRequest request, HttpServletResponse response) {
+    public static CurrentUser currentUser(@Nullable String sessionID, HttpServletRequest request, HttpServletResponse response) {
         try {
             SessionKey key = new WebSessionKey(sessionID, request, response);
             Session se = SecurityUtils.getSecurityManager().getSession(key);

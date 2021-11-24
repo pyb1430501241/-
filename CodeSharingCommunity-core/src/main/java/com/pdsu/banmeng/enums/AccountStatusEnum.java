@@ -3,6 +3,9 @@ package com.pdsu.banmeng.enums;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
+import org.springframework.lang.NonNull;
+
+import java.util.Arrays;
 
 /**
  * @author 半梦
@@ -11,7 +14,7 @@ import lombok.*;
  */
 @AllArgsConstructor
 @Getter
-public enum AccountStatus {
+public enum AccountStatusEnum {
 
     NORMAL(1, "正常"),
     FROZEN(2, "冻结"),
@@ -23,5 +26,15 @@ public enum AccountStatus {
 
     @JsonValue
     private String status;
+
+    /**
+     * 根据ID匹配权限
+     * @param id id
+     * @return
+     * 如果没有ID 对应的权限, 则默认为普通用户
+     */
+    public static AccountStatusEnum matchers(@NonNull Integer id) {
+        return Arrays.stream(values()).filter(e -> e.id.equals(id)).findFirst().orElse(NORMAL);
+    }
 
 }

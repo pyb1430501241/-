@@ -1,10 +1,18 @@
 package com.pdsu.banmeng.shiro;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.pdsu.banmeng.bo.EmailBo;
+import com.pdsu.banmeng.bo.ImageBo;
 import com.pdsu.banmeng.context.CurrentUser;
+import com.pdsu.banmeng.entity.AccountStatus;
 import com.pdsu.banmeng.entity.UserInformation;
 import com.pdsu.banmeng.entity.UserRole;
+import com.pdsu.banmeng.enums.AccountStatusEnum;
 import com.pdsu.banmeng.enums.RoleEnum;
+import com.pdsu.banmeng.ibo.EmailSearchIbo;
+import com.pdsu.banmeng.ibo.ImageSearchIbo;
+import com.pdsu.banmeng.service.IEmailService;
+import com.pdsu.banmeng.service.IImageService;
 import com.pdsu.banmeng.service.IUserInformationService;
 import com.pdsu.banmeng.service.IUserRoleService;
 import lombok.extern.log4j.Log4j2;
@@ -37,6 +45,12 @@ public class LoginRealm extends AuthorizingRealm {
 
     @Autowired
     private IUserRoleService userRoleService;
+
+    @Autowired
+    private IImageService imageService;
+
+    @Autowired
+    private IEmailService emailService;
 
     /**
      * MD5 加密算法
@@ -87,13 +101,20 @@ public class LoginRealm extends AuthorizingRealm {
      * @param user 用户
      */
     private void perfect(CurrentUser user) {
+        ImageBo image = imageService.getImage(modelMapper.map(user, ImageSearchIbo.class));
 
+        user.setImgPath(image.getImagePath());
+
+        EmailBo email = emailService.getEmailByUid(modelMapper.map(user, EmailSearchIbo.class));
+
+        user.setEmail(email.getEmail());
     }
 
     @NonNull
     private UserInformation getUserInformation(@NonNull Integer uid) {
         QueryWrapper<UserInformation> queryWrapper = new QueryWrapper<>();
         queryWrapper.setEntity(UserInformation.builder().uid(uid).build());
+
         try {
             return userInformationService.getOne(queryWrapper);
         } catch (Exception e) {
@@ -109,18 +130,21 @@ public class LoginRealm extends AuthorizingRealm {
         if(Objects.isNull(account)) {
             throw new UserAbnormalException("没有找到对应的用户");
         }
+
+        if(!AccountStatusEnum.NORMAL.equals(account.getAccountStatus())) {
+            throw new UserAbnormalException(account.getAccountStatus().getStatus());
+        }
     }
 
     /**
      * 负责权限分配
      */
-    public void authorizationInfo(CurrentUser currentUser) {
+    private void authorizationInfo(CurrentUser currentUser) {
         QueryWrapper<UserRole> queryWrapper = new QueryWrapper<>();
 
         queryWrapper.setEntity(UserRole.builder().uid(currentUser.getUid()).build());
 
-        currentUser.setRoleEnum(RoleEnum.matchers(userRoleService.getOne(queryWrapper).getRoleId()));
-
+        currentUser.setRole(RoleEnum.matchers(userRoleService.getOne(queryWrapper).getRoleId()));
     }
 
 
