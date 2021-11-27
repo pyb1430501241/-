@@ -8,9 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.Version;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -22,6 +20,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("db_image")
 public class Image implements Serializable {

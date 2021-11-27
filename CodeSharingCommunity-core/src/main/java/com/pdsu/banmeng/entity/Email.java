@@ -6,9 +6,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -20,6 +18,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("db_email")
 public class Email implements Serializable {

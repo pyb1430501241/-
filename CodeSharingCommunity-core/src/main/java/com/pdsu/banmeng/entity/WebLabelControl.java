@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -19,7 +18,10 @@ import lombok.EqualsAndHashCode;
  * @since 2021-11-20
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@Builder
 @TableName("db_web_label_control")
 public class WebLabelControl implements Serializable {
 
@@ -32,12 +34,12 @@ public class WebLabelControl implements Serializable {
     private Integer id;
 
     /**
-     * webid，绑定db_web_informaion
+     * wid，绑定db_web_information
      */
     private Integer wid;
 
     /**
-     * lableid，绑定db_web_lableid
+     * lid，绑定db_web_lid
      */
     private Integer lid;
 

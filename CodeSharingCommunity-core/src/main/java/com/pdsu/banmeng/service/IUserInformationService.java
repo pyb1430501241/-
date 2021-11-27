@@ -1,12 +1,14 @@
 package com.pdsu.banmeng.service;
 
+import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.entity.UserInformation;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.pdsu.banmeng.function.BooleanConsumer;
 import com.pdsu.banmeng.ibo.ApplyAccountIbo;
 import com.pdsu.banmeng.ibo.UserSearchIbo;
 
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -33,6 +35,14 @@ public interface IUserInformationService extends IService<UserInformation> {
      * @return
      * 是否添加成功
      */
-    boolean applyAccount(ApplyAccountIbo applyAccountIbo, BooleanConsumer<UserInformation> after);
+    boolean applyAccount(ApplyAccountIbo applyAccountIbo, Function<UserInformation, Boolean> after);
+
+    /**
+     * 根据uid 获取用户
+     * @param uids uid
+     * @return
+     * 一组用户
+     */
+    List<CurrentUser> listByUids(List<Integer> uids);
 
 }

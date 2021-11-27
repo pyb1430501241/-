@@ -8,9 +8,12 @@ import com.pdsu.banmeng.mapper.ImageMapper;
 import com.pdsu.banmeng.service.IImageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -30,7 +33,17 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
     @Cacheable(value = "CodeSharingCommunity_ImageService_getImage", key = "#image.uid")
     public ImageBo getImage(ImageSearchIbo image) {
         return modelMapper.map(getOne(new QueryWrapper<Image>()
-                .setEntity(Image.builder().uid(image.getUid()).build())), ImageBo.class);
+                .setEntity(modelMapper.map(image, Image.class))), ImageBo.class);
+    }
+
+    @Override
+    @Cacheable(value = "CodeSharingCommunity_ImageService_listImageByUids", key = "#uids")
+    public List<ImageBo> listImageByUids(List<Integer> uids) {
+        QueryWrapper<Image> queryWrapper = new QueryWrapper<>();
+
+        queryWrapper.in("uid", uids);
+
+        return modelMapper.map(list(queryWrapper), new TypeToken<List<ImageBo>>(){}.getType());
     }
 
 }

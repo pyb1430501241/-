@@ -7,7 +7,7 @@ server:
     encoding:
       charset: UTF-8
     context-path: /
-  max-http-header-size: 128KB
+  max-http-header-size: 512KB
   compression:
     enabled: true
 spring:
@@ -33,6 +33,7 @@ spring:
     type: redis
     redis:
       key-prefix: ${spring.application.name}
+      time-to-live: 30s
   redis:
     host: localhost
     password: pyb***20000112
@@ -42,7 +43,9 @@ spring:
         max-active: 60
         max-wait: 60
         max-idle: 10
-
+  jackson:
+    date-format: yyyy-MM-dd HH:MM:ss
+    time-zone: GMT+8
 eureka:
   client:
     fetch-registry: true

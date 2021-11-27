@@ -94,6 +94,14 @@ public class UserController {
         return new SimpleResponse<>(ShiroUtils.currentUser());
     }
 
+    @PostMapping("/logout")
+    @User
+    @ApiOperation(value = "退出登录")
+    public SimpleResponse<Boolean> logout() {
+        SecurityUtils.getSubject().logout();
+        return new SimpleResponse<>(true);
+    }
+
     @PostMapping("/applyCode")
     @Tourist
     @ApiOperation(value = "申请账号时, 发送邮箱验证码")
@@ -133,6 +141,16 @@ public class UserController {
         Assert.isTrue(code.equalsIgnoreCase(redisCode), StatusEnum.EMAIL_CODE_ERROR);
     }
 
+    /**
+     * 发送邮箱信息
+     * @param prefix token 前缀
+     * @param email 邮箱
+     * @param name 用户名
+     * @return
+     *  token
+     * @throws EmailException
+     * 发送失败
+     */
     @NonNull
     private String sendEmail(String prefix, String email, String name) throws EmailException {
         EmailHelper helper = new EmailHelper();

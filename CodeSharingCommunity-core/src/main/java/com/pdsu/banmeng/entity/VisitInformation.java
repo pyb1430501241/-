@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -20,7 +19,10 @@ import lombok.EqualsAndHashCode;
  * @since 2021-11-20
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@Builder
 @TableName("db_visit_information")
 public class VisitInformation implements Serializable {
 

@@ -9,6 +9,10 @@ import com.pdsu.banmeng.utils.JsonUtils;
 import com.pdsu.banmeng.utils.ShiroUtils;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
+import java.util.Enumeration;
 import java.util.Objects;
 
 /**
@@ -44,8 +48,8 @@ public class ZuulPreFilter extends ZuulFilter {
         }
 
         RequestContext context = RequestContext.getCurrentContext();
+
         context.addZuulRequestHeader(HttpUtils.getSessionHeader(), JsonUtils.toJson(currentUser));
-        context.setSendZuulResponse(true);
 
         return null;
     }

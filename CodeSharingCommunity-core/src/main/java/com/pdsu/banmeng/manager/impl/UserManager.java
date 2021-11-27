@@ -1,24 +1,31 @@
 package com.pdsu.banmeng.manager.impl;
 
+import com.pdsu.banmeng.bo.AuthorBo;
+import com.pdsu.banmeng.bo.FansInformationBo;
+import com.pdsu.banmeng.bo.PageTemplateBo;
+import com.pdsu.banmeng.bo.SimpleBlobBo;
+import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.entity.Email;
 import com.pdsu.banmeng.entity.Image;
 import com.pdsu.banmeng.entity.UserInformation;
 import com.pdsu.banmeng.entity.UserRole;
 import com.pdsu.banmeng.enums.RoleEnum;
 import com.pdsu.banmeng.enums.StatusEnum;
-import com.pdsu.banmeng.ibo.ApplyAccountIbo;
-import com.pdsu.banmeng.ibo.UserSearchIbo;
+import com.pdsu.banmeng.ibo.*;
 import com.pdsu.banmeng.manager.IUserManager;
-import com.pdsu.banmeng.service.IEmailService;
-import com.pdsu.banmeng.service.IImageService;
-import com.pdsu.banmeng.service.IUserInformationService;
-import com.pdsu.banmeng.service.IUserRoleService;
+import com.pdsu.banmeng.service.*;
 import com.pdsu.banmeng.utils.Assert;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author 半梦
@@ -39,6 +46,27 @@ public class UserManager implements IUserManager {
 
     @Autowired
     private IEmailService emailService;
+
+    @Autowired
+    private IWebInformationService webInformationService;
+
+    @Autowired
+    private ILikeService likeService;
+
+    @Autowired
+    private IWebThumbsService webThumbsService;
+
+    @Autowired
+    private IVisitInformationService visitInformationService;
+
+    @Autowired
+    private IWebFileService fileService;
+
+    @Autowired
+    private IFileDownloadService downloadService;
+
+    @Autowired
+    private ICollectionService collectionService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -69,6 +97,62 @@ public class UserManager implements IUserManager {
      */
     private boolean afterApplyAccount(UserInformation user) {
         return true;
+    }
+
+    @Override
+    @Cacheable(value = "Code_Sharing_Community_UserManager_getAuthor", key = "#uid")
+    public AuthorBo getAuthor(Integer uid, CurrentUser currentUser) {
+        Assert.isTrue(userInformationService.isExist(UserSearchIbo.builder().uid(uid).build()), StatusEnum.NOT_FOUND);
+
+        CurrentUser user = userInformationService.listByUids(Collections.singletonList(uid)).get(0);
+        List<SimpleBlobBo> blobs = modelMapper.map(webInformationService.page(BlobSearchIbo
+                .builder().p(1).size(5).uid(uid).build()).getRecords(), new TypeToken<List<SimpleBlobBo>>(){}.getType());
+        String imagePath = imageService.getImage(ImageSearchIbo.builder().uid(uid).build()).getImagePath();
+        Integer fansNumber = likeService.count(LikeSearchIbo.builder().likeId(uid).build());
+        Integer thumbsNumber = webThumbsService.count(ThumbsSearchIbo.builder().bid(uid).build());
+        Integer commentNumber = 0;
+        Integer commentReplyNumber = 0;
+        Integer collectionNumber = collectionService.count(CollectionSearchIbo.builder().bid(uid).build());
+        Integer visitNumber = visitInformationService.count(VisitSearchIbo.builder().sid(uid).build());
+        Integer originalNumber = webInformationService.count(BlobSearchIbo.builder().uid(uid).type(1).build());
+        Integer attentionNumber = likeService.count(LikeSearchIbo.builder().uid(uid).build());
+        Integer fileNumber = fileService.count(FileSearchIbo.builder().uid(uid).build());
+        Integer downloadNumber = downloadService.count(FileDownloadSearchIbo.builder().bid(uid).build());
+        Boolean like = true;
+
+        System.err.println(currentUser);
+
+        if(currentUser == null) {
+            like = false;
+        } else {
+            like = likeService.isExist(LikeSearchIbo.builder()
+                    .uid(currentUser.getUid())
+                    .likeId(uid)
+                    .build());
+        }
+
+        return AuthorBo.builder()
+                .uid(uid)
+                .id(user.getId())
+                .username(user.getUsername())
+                .lastBlob(blobs)
+                .imagePath(imagePath)
+                .fansNumber(fansNumber)
+                .thumbsNumber(thumbsNumber)
+                .collectionNumber(collectionNumber)
+                .commentNumber(commentNumber + commentReplyNumber)
+                .visitNumber(visitNumber)
+                .originalNumber(originalNumber)
+                .attentionNumber(attentionNumber)
+                .fileNumber(fileNumber)
+                .downloadNumber(downloadNumber)
+                .like(like)
+                .build();
+    }
+
+    @Override
+    public PageTemplateBo<FansInformationBo> getFans(FansSearchIbo ibo) {
+        return null;
     }
 
 }

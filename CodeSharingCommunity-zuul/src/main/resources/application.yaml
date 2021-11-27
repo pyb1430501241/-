@@ -37,6 +37,7 @@ spring:
     type: redis
     redis:
       key-prefix: ${spring.application.name}
+      time-to-live: 30s
   redis:
     host: localhost
     password: pyb***20000112

@@ -6,8 +6,10 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -18,6 +20,8 @@ import lombok.EqualsAndHashCode;
  * @since 2021-11-20
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("db_role")
 public class Role implements Serializable {

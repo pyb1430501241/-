@@ -25,6 +25,10 @@ public enum StatusEnum {
     USER_IMAGE_ADD_ERROR(557, "添加头像信息失败"),
     USER_ROLE_ADD_ERROR(558, "分配用户权限失败"),
     USER_EMAIL_ADD_ERROR(559, "添加用户邮箱失败"),
+    BLOB_ADD_ERROR(600, "发布博客失败"),
+    BLOB_LABEL_ADD_ERROR(601, "更新博客标签失败"),
+    UNKNOWN_REVERSAL_TYPE(700, "未知的反转类型"),
+    REVERSAL_ERROR(801, "请稍后重试"),
     NOT_FOUND(404, "未找到");
 
     private Integer code;

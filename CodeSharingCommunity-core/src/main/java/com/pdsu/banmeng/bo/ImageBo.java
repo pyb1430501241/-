@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author 半梦
  * @email 1430501241@qq.com
@@ -14,10 +16,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class ImageBo {
+public class ImageBo implements Serializable {
 
     private Integer uid;
 
     private String imagePath;
 
+    public ImageBo(String imagePath) {
+        this.imagePath = imagePath;
+    }
 }

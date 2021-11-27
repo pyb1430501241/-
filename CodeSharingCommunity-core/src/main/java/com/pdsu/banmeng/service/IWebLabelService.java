@@ -1,7 +1,10 @@
 package com.pdsu.banmeng.service;
 
+import com.pdsu.banmeng.bo.WebLabelBo;
 import com.pdsu.banmeng.entity.WebLabel;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-11-20
  */
 public interface IWebLabelService extends IService<WebLabel> {
+
+    /**
+     * 获取所有的标签
+     * @return
+     */
+    List<WebLabelBo> lists();
 
 }

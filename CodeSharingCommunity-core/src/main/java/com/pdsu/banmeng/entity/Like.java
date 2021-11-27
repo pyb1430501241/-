@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -19,6 +18,9 @@ import lombok.EqualsAndHashCode;
  * @since 2021-11-20
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @EqualsAndHashCode(callSuper = false)
 @TableName("db_like")
 public class Like implements Serializable {

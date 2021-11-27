@@ -1,9 +1,6 @@
 package com.pdsu.banmeng.context;
 
-import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.pdsu.banmeng.enums.RoleEnum;
 import lombok.*;
 

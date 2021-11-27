@@ -10,6 +10,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Enumeration;
 
 /**
  * @author 半梦
@@ -32,7 +33,7 @@ public class UserInterceptor extends HandlerInterceptorAdapter {
         String currentUserJson = request.getHeader(HttpUtils.getSessionHeader());
 
         if(currentUserJson == null) {
-            super.preHandle(request, response, handler);
+            return super.preHandle(request, response, handler);
         }
 
         RequestContext.setCurrentUser(JsonUtils.toObject(currentUserJson, CurrentUser.class));

@@ -7,8 +7,7 @@ import java.sql.Blob;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -19,7 +18,10 @@ import lombok.EqualsAndHashCode;
  * @since 2021-11-20
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@Builder
 @TableName("db_web_information")
 public class WebInformation implements Serializable {
 
@@ -39,7 +41,7 @@ public class WebInformation implements Serializable {
     /**
      * 文章主体内容
      */
-    private Blob webData;
+    private byte[] webData;
 
     /**
      * 投稿人学号，绑定db_userinformation里的uid
@@ -53,7 +55,6 @@ public class WebInformation implements Serializable {
 
     /**
      * 投稿时间
-
      */
     private Date createTime;
 
@@ -64,6 +65,5 @@ public class WebInformation implements Serializable {
 
     @Version
     private Integer version;
-
 
 }

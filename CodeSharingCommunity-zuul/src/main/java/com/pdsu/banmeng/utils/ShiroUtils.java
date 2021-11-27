@@ -47,9 +47,11 @@ public abstract class ShiroUtils {
     public static String getSessionId() {
         Subject subject = SecurityUtils.getSubject();
         Session session = subject.getSession(false);
+
         if(Objects.isNull(session)) {
             return null;
         }
+
         return (String) session.getId();
     }
 
