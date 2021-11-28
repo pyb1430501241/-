@@ -54,7 +54,8 @@ public class WebInformationServiceImpl extends ServiceImpl<WebInformationMapper,
     public Page<WebInformation> page(BlobSearchIbo searchIbo) {
         return page(new Page<>(searchIbo.getP(), searchIbo.getSize())
                 , new QueryWrapper<WebInformation>()
-                        .setEntity(modelMapper.map(searchIbo, WebInformation.class)));
+                        .setEntity(modelMapper.map(searchIbo, WebInformation.class))
+                        .orderByDesc("update_time"));
     }
 
     @Override

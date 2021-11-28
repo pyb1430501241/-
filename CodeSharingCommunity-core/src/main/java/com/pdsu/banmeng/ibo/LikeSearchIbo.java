@@ -20,4 +20,8 @@ public class LikeSearchIbo {
 
     private Integer likeId;
 
+    private Integer p;
+
+    private Integer size;
+
 }

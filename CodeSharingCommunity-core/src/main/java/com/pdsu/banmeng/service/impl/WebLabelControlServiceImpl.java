@@ -28,7 +28,7 @@ public class WebLabelControlServiceImpl extends ServiceImpl<WebLabelControlMappe
     @Cacheable(value = "Code_Sharing_Community_WebLabelControlService_getWebIdsById", key = "#ibo")
     public List<Integer> getWebIdsById(BlobSearchIbo ibo) {
         return page(new Page<>(ibo.getP(), 10), new QueryWrapper<WebLabelControl>()
-                .setEntity(WebLabelControl.builder().lid(ibo.getLid()).build()))
+                .setEntity(WebLabelControl.builder().lid(ibo.getLid()).build()).orderByDesc("update_time"))
                 .getRecords().stream().map(WebLabelControl :: getWid).collect(Collectors.toList());
     }
 

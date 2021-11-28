@@ -1,6 +1,7 @@
 package com.pdsu.banmeng.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pdsu.banmeng.bo.ReversalBo;
 import com.pdsu.banmeng.entity.Like;
 import com.pdsu.banmeng.ibo.LikeRemoveIbo;
@@ -10,6 +11,7 @@ import com.pdsu.banmeng.service.ILikeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -50,8 +52,15 @@ public class LikeServiceImpl extends ServiceImpl<LikeMapper, Like> implements IL
     }
 
     @Override
+    @CacheEvict(value = "Code_Sharing_Community_UserManger_getFans", allEntries = true)
     public Boolean remove(LikeRemoveIbo ibo) {
         return remove(new QueryWrapper<Like>().setEntity(modelMapper.map(ibo, Like.class)));
     }
 
+    @Override
+    public Page<Like> page(LikeSearchIbo ibo) {
+        return page(new Page<>(ibo.getP(), ibo.getSize())
+                , new QueryWrapper<Like>().setEntity(modelMapper.map(ibo, Like.class))
+                        .orderByDesc("update_time"));
+    }
 }

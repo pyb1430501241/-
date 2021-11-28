@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 半梦
@@ -112,6 +113,7 @@ public class BlobManager implements IBlobManager {
             page = webInformationService.page(ibo);
         } else {
             List<Integer> webIds = webLabelControlService.getWebIdsById(ibo);
+
             Assert.isFalse(webIds.size() == 0, StatusEnum.NOT_FOUND);
 
             page.setRecords(webInformationService.listByIds(webIds));
@@ -127,16 +129,11 @@ public class BlobManager implements IBlobManager {
             webIds.add(e.getId());
         });
 
-        List<CurrentUser> users = userInformationService.listByUids(uids);
-        List<ImageBo> userImages = imageService.listImageByUids(uids);
+        Map<Integer, CurrentUser> users = userInformationService.listByUids(uids).stream()
+                .collect(Collectors.toMap(CurrentUser :: getUid, CurrentUser :: context));
+        Map<Integer, String> userImages = imageService.listImageByUids(uids).stream()
+                .collect(Collectors.toMap(ImageBo::getUid, ImageBo::getImagePath));
         List<SimpleBlobBo> blobs = modelMapper.map(page.getRecords(), new TypeToken<List<SimpleBlobBo>>(){}.getType());
-
-        // 填充用户头像信息
-        users.forEach(u -> {
-            u.setImgPath(userImages.stream()
-                    .filter(e -> e.getUid().equals(u.getUid()))
-                    .findFirst().orElse(new ImageBo("12.png")).getImagePath());
-        });
 
         List<SimpleBlobIndexBo> list = new ArrayList<>();
 
@@ -145,7 +142,11 @@ public class BlobManager implements IBlobManager {
             SimpleBlobIndexBo index = new SimpleBlobIndexBo();
 
             index.setBlob(blob);
-            index.setUser(users.stream().filter(e -> e.getUid().equals(blob.getUid())).findFirst().orElse(new CurrentUser()));
+
+            CurrentUser currentUser = users.get(blob.getUid());
+            currentUser.setImgPath(userImages.get(blob.getUid()));
+
+            index.setUser(currentUser);
 
             list.add(index);
         });
@@ -195,6 +196,9 @@ public class BlobManager implements IBlobManager {
     }
 
     @Override
+    @CacheEvict(value = {
+            "Code_Sharing_Community_UserManger_getFans",
+    }, allEntries = true)
     public ReversalBo reversal(ReversalStatusIbo ibo, CurrentUser currentUser) {
         Assert.isTrue(webInformationService.isExistById(ibo.getWebId()), StatusEnum.NOT_FOUND);
 
@@ -285,6 +289,7 @@ public class BlobManager implements IBlobManager {
 
         list.forEach(blob -> {
             Integer webId = blob.getBlob().getId();
+
             blob.setVisit(visits.get(webId));
             blob.setThumbs(thumbs.get(webId));
             blob.setCollection(collections.get(webId));

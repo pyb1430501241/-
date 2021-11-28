@@ -1,20 +1,16 @@
 package com.pdsu.banmeng.manager.impl;
 
-import com.pdsu.banmeng.bo.AuthorBo;
-import com.pdsu.banmeng.bo.FansInformationBo;
-import com.pdsu.banmeng.bo.PageTemplateBo;
-import com.pdsu.banmeng.bo.SimpleBlobBo;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pdsu.banmeng.bo.*;
 import com.pdsu.banmeng.context.CurrentUser;
-import com.pdsu.banmeng.entity.Email;
-import com.pdsu.banmeng.entity.Image;
-import com.pdsu.banmeng.entity.UserInformation;
-import com.pdsu.banmeng.entity.UserRole;
+import com.pdsu.banmeng.entity.*;
 import com.pdsu.banmeng.enums.RoleEnum;
 import com.pdsu.banmeng.enums.StatusEnum;
 import com.pdsu.banmeng.ibo.*;
 import com.pdsu.banmeng.manager.IUserManager;
 import com.pdsu.banmeng.service.*;
 import com.pdsu.banmeng.utils.Assert;
+import org.apache.tomcat.util.http.fileupload.RequestContext;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +19,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 半梦
@@ -151,8 +146,50 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public PageTemplateBo<FansInformationBo> getFans(FansSearchIbo ibo) {
-        return null;
+    @Cacheable(value = "Code_Sharing_Community_UserManger_getFans", key = "#ibo")
+    public PageTemplateBo<FansInformationBo> getFansOrFollow(LikeSearchIbo ibo, CurrentUser currentUser) {
+        Page<Like> page = likeService.page(ibo);
+
+        List<Integer> uids;
+
+        // 如果uid 为空则代表使用LikeId 查询信息
+        // 即 查询的是fans
+        // 反之则认为查询的是follow
+        if(ibo.getUid() == null) {
+            uids = page.getRecords().stream().map(Like :: getUid).collect(Collectors.toList());
+        } else {
+            uids = page.getRecords().stream().map(Like :: getLikeId).collect(Collectors.toList());
+        }
+
+        Assert.isTrue(uids.size() != 0, StatusEnum.NOT_FOUND);
+
+        List<CurrentUser> users = userInformationService.listByUids(uids);
+        Map<Integer, String> images = imageService.listImageByUids(uids).stream()
+                .collect(Collectors.toMap(ImageBo :: getUid, ImageBo :: getImagePath));
+
+        List<FansInformationBo> list = new ArrayList<>();
+
+        users.forEach(user -> {
+
+            user.setImgPath(images.get(user.getUid()));
+
+            list.add(FansInformationBo.builder()
+                    .user(user)
+                    // 如果当前有登录用户, 则判断当前用户是否关注了的fans
+                    .like(currentUser != null ? likeService.isExist(LikeSearchIbo.builder()
+                            .uid(currentUser.getUid())
+                            .likeId(user.getUid())
+                            .build()) : false)
+                    .build());
+
+        });
+
+        PageTemplateBo<FansInformationBo> lastList = new PageTemplateBo<>();
+
+        lastList.init(page);
+        lastList.setRecords(list);
+
+        return lastList;
     }
 
 }

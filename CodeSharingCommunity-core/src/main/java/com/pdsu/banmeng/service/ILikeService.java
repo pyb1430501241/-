@@ -1,9 +1,9 @@
 package com.pdsu.banmeng.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pdsu.banmeng.bo.ReversalBo;
 import com.pdsu.banmeng.entity.Like;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.pdsu.banmeng.ibo.CollectionSearchIbo;
 import com.pdsu.banmeng.ibo.LikeRemoveIbo;
 import com.pdsu.banmeng.ibo.LikeSearchIbo;
 
@@ -49,4 +49,11 @@ public interface ILikeService extends IService<Like> {
      * @return
      */
     Boolean remove(LikeRemoveIbo ibo);
+
+    /**
+     * 获取特定条件的关注信息
+     * @param ibo
+     * @return
+     */
+    Page<Like> page(LikeSearchIbo ibo);
 }

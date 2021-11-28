@@ -5,7 +5,7 @@ import com.pdsu.banmeng.bo.FansInformationBo;
 import com.pdsu.banmeng.bo.PageTemplateBo;
 import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.ibo.ApplyAccountIbo;
-import com.pdsu.banmeng.ibo.FansSearchIbo;
+import com.pdsu.banmeng.ibo.LikeSearchIbo;
 
 /**
  * @author 半梦
@@ -35,6 +35,6 @@ public interface IUserManager {
      * @param ibo 条件
      * @return
      */
-    PageTemplateBo<FansInformationBo> getFans(FansSearchIbo ibo);
+    PageTemplateBo<FansInformationBo> getFansOrFollow(LikeSearchIbo ibo, CurrentUser currentUser);
 
 }

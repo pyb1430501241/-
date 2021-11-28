@@ -1,9 +1,12 @@
 package com.pdsu.banmeng.bo;
 
+import com.pdsu.banmeng.context.CurrentUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * @author 半梦
@@ -14,5 +17,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class FansInformationBo {
+public class FansInformationBo implements Serializable {
+
+    private CurrentUser user;
+
+    private Boolean like = false;
+
 }

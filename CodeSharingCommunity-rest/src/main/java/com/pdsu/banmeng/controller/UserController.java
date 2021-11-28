@@ -6,11 +6,11 @@ import com.pdsu.banmeng.bo.PageTemplateBo;
 import com.pdsu.banmeng.business.Tourist;
 import com.pdsu.banmeng.context.RequestContext;
 import com.pdsu.banmeng.dto.SimpleResponse;
-import com.pdsu.banmeng.ibo.FansSearchIbo;
+import com.pdsu.banmeng.ibo.LikeSearchIbo;
 import com.pdsu.banmeng.manager.IUserManager;
-import com.pdsu.banmeng.manager.impl.UserManager;
 import com.pdsu.banmeng.service.IEmailService;
 import com.pdsu.banmeng.vo.FansSearchVo;
+import com.pdsu.banmeng.vo.FollowSearchVo;
 import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,16 @@ public class UserController {
     @ApiOperation("获取用户的粉丝")
     @Tourist
     public SimpleResponse<PageTemplateBo<FansInformationBo>> getFans(@RequestBody FansSearchVo vo) {
-        return new SimpleResponse<>(userManager.getFans(modelMapper.map(vo, FansSearchIbo.class)));
+        return new SimpleResponse<>(userManager.getFansOrFollow(modelMapper.map(vo, LikeSearchIbo.class)
+                , RequestContext.currentUser()));
+    }
+
+    @PostMapping("/follow")
+    @ApiOperation("获取用户的关注")
+    @Tourist
+    public SimpleResponse<PageTemplateBo<FansInformationBo>> getFollow(@RequestBody FollowSearchVo vo) {
+        return new SimpleResponse<>(userManager.getFansOrFollow(modelMapper.map(vo, LikeSearchIbo.class)
+                , RequestContext.currentUser()));
     }
 
 }

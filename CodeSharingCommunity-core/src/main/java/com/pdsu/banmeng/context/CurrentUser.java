@@ -17,7 +17,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CurrentUser implements Serializable {
+public class CurrentUser implements Serializable, Cloneable {
 
     private Integer id;
 
@@ -32,5 +32,9 @@ public class CurrentUser implements Serializable {
     private String email;
 
     private RoleEnum role;
+
+    public CurrentUser context() {
+        return this;
+    }
 
 }
