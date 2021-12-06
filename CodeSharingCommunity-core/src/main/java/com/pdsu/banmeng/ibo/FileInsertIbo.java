@@ -4,23 +4,27 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author 半梦
  * @email 1430501241@qq.com
- * @since 2021-11-25 21:09
+ * @since 2021-12-06 19:14
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class FileSearchIbo {
+public class FileInsertIbo {
 
-    /**
-     * 上传人学号,绑定db_user_information里的uid
-     */
+    private MultipartFile file;
+
     private Integer uid;
 
     private String title;
+
+    private String description;
+
+    private String filePath;
 
 }

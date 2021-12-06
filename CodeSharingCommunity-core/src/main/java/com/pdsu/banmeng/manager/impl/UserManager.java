@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pdsu.banmeng.bo.*;
 import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.entity.*;
+import com.pdsu.banmeng.enums.FileTypeEnum;
 import com.pdsu.banmeng.enums.RoleEnum;
 import com.pdsu.banmeng.enums.StatusEnum;
 import com.pdsu.banmeng.ibo.*;
@@ -18,6 +19,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,6 +64,9 @@ public class UserManager implements IUserManager {
 
     @Autowired
     private ICollectionService collectionService;
+
+    @Autowired
+    private IFileStorageService fileStorageService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -190,6 +195,16 @@ public class UserManager implements IUserManager {
         lastList.setRecords(list);
 
         return lastList;
+    }
+
+    @Override
+    public Boolean updateUserImage(MultipartFile file, CurrentUser currentUser) {
+        String imageName = fileStorageService.save(file, FileTypeEnum.USER_IMAGE);
+
+        currentUser.setImgPath(imageName);
+
+        return imageService.update(ImageUpdateIbo.builder()
+                .imagePath(imageName).uid(currentUser.getUid()).build());
     }
 
 }

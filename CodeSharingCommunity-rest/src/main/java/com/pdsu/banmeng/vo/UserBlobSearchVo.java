@@ -21,4 +21,6 @@ public class UserBlobSearchVo {
 
     private Integer p = 1;
 
+    private Integer size = 10;
+
 }

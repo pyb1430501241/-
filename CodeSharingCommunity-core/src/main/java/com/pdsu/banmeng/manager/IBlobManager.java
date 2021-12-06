@@ -43,7 +43,7 @@ public interface IBlobManager {
     BlobInformationBo toBlob(Integer webId, CurrentUser user);
 
     /**
-     * 反转用户对点赞和收藏的状态
+     * 反转用户对点赞、关注和收藏的状态
      * @return
      */
     ReversalBo reversal(ReversalStatusIbo ibo, CurrentUser currentUser);
@@ -64,4 +64,13 @@ public interface IBlobManager {
      * 是否成功
      */
     Boolean deleteBlob(Integer id, CurrentUser currentUser);
+
+    /**
+     * 获取用的收藏
+     * @param ibo 条件
+     * @return
+     * 是否成功
+     */
+    PageTemplateBo<SimpleUserBlobBo> getCollection(UserBlobSearchIbo ibo);
+
 }

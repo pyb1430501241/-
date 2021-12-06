@@ -1,6 +1,7 @@
 package com.pdsu.banmeng.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pdsu.banmeng.bo.ReversalBo;
 import com.pdsu.banmeng.entity.Collection;
 import com.pdsu.banmeng.ibo.CollectionRemoveIbo;
@@ -69,4 +70,12 @@ public class CollectionServiceImpl extends ServiceImpl<CollectionMapper, Collect
     public Boolean remove(CollectionRemoveIbo ibo) {
         return remove(new QueryWrapper<Collection>().setEntity(modelMapper.map(ibo, Collection.class)));
     }
+
+
+    @Override
+    public Page<Collection> page(CollectionSearchIbo ibo) {
+    return page(new Page<>(ibo.getP(), ibo.getSize()), new QueryWrapper<Collection>()
+            .setEntity(modelMapper.map(ibo, Collection.class)).orderByDesc("create_time"));
+    }
+
 }

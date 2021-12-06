@@ -8,13 +8,16 @@ import com.pdsu.banmeng.dto.SimpleResponse;
 import com.pdsu.banmeng.enums.StatusEnum;
 import com.pdsu.banmeng.ibo.ApplyAccountIbo;
 import com.pdsu.banmeng.ibo.EmailSearchIbo;
+import com.pdsu.banmeng.ibo.UserUpdateIbo;
 import com.pdsu.banmeng.manager.IUserManager;
 import com.pdsu.banmeng.manager.impl.UserManager;
 import com.pdsu.banmeng.service.IEmailService;
+import com.pdsu.banmeng.service.IUserInformationService;
 import com.pdsu.banmeng.utils.*;
 import com.pdsu.banmeng.vo.ApplyAccountVo;
 import com.pdsu.banmeng.vo.ApplyCodeVo;
 import com.pdsu.banmeng.vo.LoginVo;
+import com.pdsu.banmeng.vo.UserUpdateVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.Serializable;
@@ -57,6 +61,9 @@ public class UserController {
 
     @Autowired
     private IUserManager userManager;
+
+    @Autowired
+    private IUserInformationService userInformationService;
 
     @PostMapping("/login")
     @Tourist
@@ -124,6 +131,37 @@ public class UserController {
         applyAccount.setPassword(HashUtils.md5(applyAccount.getUid(), applyAccount.getPassword()));
 
         return new SimpleResponse<>(userManager.applyAccount(modelMapper.map(applyAccount, ApplyAccountIbo.class)));
+    }
+
+    @PostMapping(value = "/image")
+    @User
+    @ApiOperation(value = "更换头像")
+    public SimpleResponse<Boolean> updateUserImage(MultipartFile image) {
+        CurrentUser currentUser = ShiroUtils.currentUser();
+        Boolean b = userManager.updateUserImage(image, currentUser);
+
+        // 如果更换成功则刷新当前用户的信息
+        if(b) {
+            ShiroUtils.flushCurrentUser(currentUser);
+        }
+
+        return new SimpleResponse<>(b);
+    }
+
+    @PostMapping("/update")
+    @User
+    @ApiOperation(value = "更新用户信息")
+    public SimpleResponse<CurrentUser> updateUserInformation(@RequestBody UserUpdateVo vo) {
+        Boolean b = userInformationService.update(modelMapper.map(vo, UserUpdateIbo.class));
+
+        CurrentUser currentUser = ShiroUtils.currentUser();
+
+        if(b) {
+            modelMapper.map(vo, currentUser);
+            ShiroUtils.flushCurrentUser(currentUser);
+        }
+
+        return new SimpleResponse<>(currentUser);
     }
 
     /**

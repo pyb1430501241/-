@@ -4,6 +4,7 @@ import com.pdsu.banmeng.bo.ImageBo;
 import com.pdsu.banmeng.entity.Image;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pdsu.banmeng.ibo.ImageSearchIbo;
+import com.pdsu.banmeng.ibo.ImageUpdateIbo;
 
 import java.util.List;
 
@@ -32,4 +33,10 @@ public interface IImageService extends IService<Image> {
      */
     List<ImageBo> listImageByUids(List<Integer> uids);
 
+    /**
+     * 更新头像信息, 根据Uid更新
+     * @param ibo
+     * @return
+     */
+    Boolean update(ImageUpdateIbo ibo);
 }

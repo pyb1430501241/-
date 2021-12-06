@@ -1,5 +1,6 @@
 package com.pdsu.banmeng.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pdsu.banmeng.bo.ReversalBo;
 import com.pdsu.banmeng.entity.Collection;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -58,4 +59,12 @@ public interface ICollectionService extends IService<Collection> {
      * @return
      */
     Boolean remove(CollectionRemoveIbo iob);
+
+    /**
+     * 根据条件查询收藏信息
+     * @param ibo 条件
+     * @return
+     * 分页的收藏信息
+     */
+    Page<Collection> page(CollectionSearchIbo ibo);
 }

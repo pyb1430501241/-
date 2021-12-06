@@ -5,6 +5,7 @@ import com.pdsu.banmeng.enums.StatusEnum;
 import com.pdsu.banmeng.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.mail.EmailException;
+import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -33,6 +34,12 @@ public class GlobalExceptionHandling {
     public SimpleResponse<Object> handlingEmailException(EmailException e) {
         log.info("项目发生业务异常：" + e.getMessage());
         return new SimpleResponse<>(StatusEnum.EMAIL_ERROR);
+    }
+
+    @ExceptionHandler(SizeLimitExceededException.class)
+    public SimpleResponse<Object> handingSizeLimitExceededException(SizeLimitExceededException e) {
+        log.info("项目发生业务异常" + e.getMessage());
+        return new SimpleResponse<>(StatusEnum.FILE_SIZE_TOO_LARGE);
     }
 
 }

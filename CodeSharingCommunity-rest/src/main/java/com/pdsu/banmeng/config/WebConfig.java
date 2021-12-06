@@ -29,7 +29,8 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/user/image/**").addResourceLocations("file:E:\\装机\\桌面\\桌面背景\\");
+        registry.addResourceHandler("/user/image/**").addResourceLocations("file:E:/codeSharingCommunity/user/image/");
+        registry.addResourceHandler("/blob/image/**").addResourceLocations("file:E:/codeSharingCommunity/blob/image/");
     }
 
 }

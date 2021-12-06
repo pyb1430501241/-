@@ -29,6 +29,11 @@ public enum StatusEnum {
     BLOB_LABEL_ADD_ERROR(601, "更新博客标签失败"),
     UNKNOWN_REVERSAL_TYPE(700, "未知的反转类型"),
     REVERSAL_ERROR(801, "请稍后重试"),
+    FILE_INIT_ERROR(901, "文件初始化错误"),
+    FILE_UPLOAD_ERROR(902, "文件上传失败"),
+    FILE_DOWNLOAD_ERROR(903, "文件下载失败"),
+    FILE_SIZE_TOO_LARGE(904, "文件超出限制, 请自行压缩后上传"),
+    FILE_ALREADY_EXIST(905, "不可上传同名文件, 请更换名称"),
     NOT_FOUND(404, "未找到");
 
     private Integer code;

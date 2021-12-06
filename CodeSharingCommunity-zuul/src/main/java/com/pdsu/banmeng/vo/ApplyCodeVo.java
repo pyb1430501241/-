@@ -25,6 +25,7 @@ public class ApplyCodeVo {
     private String name;
 
     @Email(message = "邮箱格式不正确")
+    @NotBlank(message = "邮箱不可为空")
     @ApiModelProperty("邮箱")
     private String email;
 

@@ -9,6 +9,10 @@ server:
   compression:
     enabled: true
 spring:
+  servlet:
+    multipart:
+      max-file-size: 300MB
+      max-request-size: 300MB
   application:
     name: CodeSharingCommunityZuulGateway
   cloud:
@@ -68,7 +72,7 @@ zuul:
     CodeSharingCommunityRest:
       path: /**
       service-id: CodeSharingCommunityRest
-  ignored-patterns: /login, /logout, /nav, /applyCode, /applyAccount
+  ignored-patterns: /login, /logout, /nav, /applyCode, /applyAccount, /image, /update
 info:
   app.name: CodeSharingCommunity_路由网关_01
   company.name: www.halfdream.cn/半梦的个人网址

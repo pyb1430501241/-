@@ -6,6 +6,7 @@ import com.pdsu.banmeng.bo.PageTemplateBo;
 import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.ibo.ApplyAccountIbo;
 import com.pdsu.banmeng.ibo.LikeSearchIbo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author 半梦
@@ -36,5 +37,13 @@ public interface IUserManager {
      * @return
      */
     PageTemplateBo<FansInformationBo> getFansOrFollow(LikeSearchIbo ibo, CurrentUser currentUser);
+
+    /**
+     * 更换用户头像
+     * @param file 文件
+     * @return
+     * 是否
+     */
+    Boolean updateUserImage(MultipartFile file, CurrentUser currentUser);
 
 }

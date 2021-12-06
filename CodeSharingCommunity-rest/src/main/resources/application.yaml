@@ -11,6 +11,10 @@ server:
   compression:
     enabled: true
 spring:
+  servlet:
+    multipart:
+      max-file-size: 300MB
+      max-request-size: 300MB
   application:
     # 同一微服务里所有的同类提供者必须同名, 所对应的微服务名称为此值全大写
     name: CodeSharingCommunityRest

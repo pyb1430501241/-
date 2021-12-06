@@ -5,11 +5,10 @@ import com.pdsu.banmeng.business.Tourist;
 import com.pdsu.banmeng.business.User;
 import com.pdsu.banmeng.context.RequestContext;
 import com.pdsu.banmeng.dto.SimpleResponse;
-import com.pdsu.banmeng.ibo.BlobInsertIbo;
-import com.pdsu.banmeng.ibo.BlobSearchIbo;
-import com.pdsu.banmeng.ibo.ReversalStatusIbo;
-import com.pdsu.banmeng.ibo.UserBlobSearchIbo;
+import com.pdsu.banmeng.enums.FileTypeEnum;
+import com.pdsu.banmeng.ibo.*;
 import com.pdsu.banmeng.manager.IBlobManager;
+import com.pdsu.banmeng.service.IFileStorageService;
 import com.pdsu.banmeng.service.ITypeService;
 import com.pdsu.banmeng.service.IWebInformationService;
 import com.pdsu.banmeng.service.IWebLabelService;
@@ -23,6 +22,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -49,6 +49,9 @@ public class BlobController {
 
     @Autowired
     private IBlobManager blobManager;
+
+    @Autowired
+    private IFileStorageService fileStorageService;
 
     @Autowired
     private IWebInformationService webInformationService;
@@ -96,7 +99,7 @@ public class BlobController {
         return new SimpleResponse<>(blobManager.reversal(modelMapper.map(vo, ReversalStatusIbo.class), RequestContext.currentUser()));
     }
 
-    @PostMapping("/getBlobs")
+    @PostMapping("/blobs")
     @ApiOperation(value = "获取用户的博客")
     @Tourist
     public SimpleResponse<PageTemplateBo<SimpleUserBlobBo>> userBlobs(@RequestBody UserBlobSearchVo searchVo) {
@@ -110,7 +113,18 @@ public class BlobController {
         return new SimpleResponse<>(blobManager.deleteBlob(id, RequestContext.currentUser()));
     }
 
+    @PostMapping("/collections")
+    @ApiOperation(value = "获取用户收藏")
+    @Tourist
+    public SimpleResponse<PageTemplateBo<SimpleUserBlobBo>> userCollectionBlobs(@RequestBody UserBlobSearchVo vo) {
+        return new SimpleResponse<>(blobManager.getCollection(modelMapper.map(vo, UserBlobSearchIbo.class)));
+    }
 
-
+    @PostMapping("/upload")
+    @ApiOperation(value = "创作博客时上传图片")
+    @User
+    public SimpleResponse<String> blobImage(MultipartFile file) {
+        return new SimpleResponse<>(fileStorageService.save(file, FileTypeEnum.BLOB_IMAGE));
+    }
 
 }

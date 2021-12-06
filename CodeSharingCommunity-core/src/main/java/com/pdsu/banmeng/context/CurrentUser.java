@@ -1,5 +1,6 @@
 package com.pdsu.banmeng.context;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pdsu.banmeng.enums.RoleEnum;
 import lombok.*;
@@ -23,6 +24,7 @@ public class CurrentUser implements Serializable, Cloneable {
 
     private Integer uid;
 
+    @JsonIgnore
     private String password;
 
     private String username;

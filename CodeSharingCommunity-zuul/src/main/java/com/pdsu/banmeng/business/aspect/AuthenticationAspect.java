@@ -1,4 +1,4 @@
-package com.pdsu.banmeng.aspect;
+package com.pdsu.banmeng.business.aspect;
 
 import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.utils.ShiroUtils;

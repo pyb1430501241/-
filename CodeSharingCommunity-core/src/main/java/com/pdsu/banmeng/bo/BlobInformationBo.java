@@ -37,4 +37,8 @@ public class BlobInformationBo implements Serializable {
 
     private Integer collection;
 
+    private Boolean thumbsStatus;
+
+    private Boolean collectionStatus;
+
 }

@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class ReversalBo {
 
-    // true 为点赞 or 收藏
-    // 反之为取消点赞 or 收藏
+    // true 为点赞 or 收藏 or 关注
+    // 反之为取消点赞 or 收藏 or 关注
     private Boolean status;
 
     private String msg;

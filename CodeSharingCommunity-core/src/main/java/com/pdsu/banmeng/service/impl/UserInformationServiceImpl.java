@@ -8,6 +8,7 @@ import com.pdsu.banmeng.enums.StatusEnum;
 import com.pdsu.banmeng.exception.BusinessException;
 import com.pdsu.banmeng.ibo.ApplyAccountIbo;
 import com.pdsu.banmeng.ibo.UserSearchIbo;
+import com.pdsu.banmeng.ibo.UserUpdateIbo;
 import com.pdsu.banmeng.mapper.UserInformationMapper;
 import com.pdsu.banmeng.service.IUserInformationService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -64,6 +65,12 @@ public class UserInformationServiceImpl extends ServiceImpl<UserInformationMappe
         queryWrapper.in("uid", uids);
 
         return modelMapper.map(list(queryWrapper), new TypeToken<List<CurrentUser>>(){}.getType());
+    }
+
+    @Override
+    public Boolean update(UserUpdateIbo ibo) {
+        return update(modelMapper.map(ibo, UserInformation.class),
+                new QueryWrapper<UserInformation>().setEntity(UserInformation.builder().uid(ibo.getUid()).build()));
     }
 
 }

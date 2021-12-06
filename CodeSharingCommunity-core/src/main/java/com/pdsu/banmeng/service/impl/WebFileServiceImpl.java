@@ -2,6 +2,7 @@ package com.pdsu.banmeng.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pdsu.banmeng.entity.WebFile;
+import com.pdsu.banmeng.ibo.FileInsertIbo;
 import com.pdsu.banmeng.ibo.FileSearchIbo;
 import com.pdsu.banmeng.mapper.WebFileMapper;
 import com.pdsu.banmeng.service.IWebFileService;
@@ -30,4 +31,29 @@ public class WebFileServiceImpl extends ServiceImpl<WebFileMapper, WebFile> impl
     public Integer count(FileSearchIbo ibo) {
         return count(new QueryWrapper<WebFile>().setEntity(modelMapper.map(ibo, WebFile.class)));
     }
+
+    @Override
+    public Boolean isExist(FileSearchIbo ibo) {
+        return count(ibo) != 0;
+    }
+
+    @Override
+    public Integer save(FileInsertIbo ibo) {
+        WebFile file = modelMapper.map(ibo, WebFile.class);
+
+        save(file);
+
+        return file.getId();
+    }
+
+    @Override
+    public Boolean update(FileInsertIbo ibo) {
+        return update(modelMapper.map(ibo, WebFile.class),
+                new QueryWrapper<WebFile>().setEntity(WebFile
+                        .builder()
+                        .uid(ibo.getUid())
+                        .title(ibo.getTitle())
+                        .build()));
+    }
+
 }

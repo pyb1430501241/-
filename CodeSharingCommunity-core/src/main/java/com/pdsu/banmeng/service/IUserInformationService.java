@@ -5,6 +5,7 @@ import com.pdsu.banmeng.entity.UserInformation;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pdsu.banmeng.ibo.ApplyAccountIbo;
 import com.pdsu.banmeng.ibo.UserSearchIbo;
+import com.pdsu.banmeng.ibo.UserUpdateIbo;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -45,4 +46,11 @@ public interface IUserInformationService extends IService<UserInformation> {
      */
     List<CurrentUser> listByUids(List<Integer> uids);
 
+    /**
+     * 更新用户信息, 根据Uid
+     * @param ibo 条件和更新条目
+     * @return
+     * 结果
+     */
+    Boolean update(UserUpdateIbo ibo);
 }

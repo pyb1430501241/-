@@ -49,7 +49,7 @@ public class UserController {
                 , RequestContext.currentUser()));
     }
 
-    @PostMapping("/follow")
+    @PostMapping("/follows")
     @ApiOperation("获取用户的关注")
     @Tourist
     public SimpleResponse<PageTemplateBo<FansInformationBo>> getFollow(@RequestBody FollowSearchVo vo) {

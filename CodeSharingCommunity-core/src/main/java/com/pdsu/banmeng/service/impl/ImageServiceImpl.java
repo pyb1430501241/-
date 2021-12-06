@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pdsu.banmeng.bo.ImageBo;
 import com.pdsu.banmeng.entity.Image;
 import com.pdsu.banmeng.ibo.ImageSearchIbo;
+import com.pdsu.banmeng.ibo.ImageUpdateIbo;
 import com.pdsu.banmeng.mapper.ImageMapper;
 import com.pdsu.banmeng.service.IImageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -44,6 +45,12 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
         queryWrapper.in("uid", uids);
 
         return modelMapper.map(list(queryWrapper), new TypeToken<List<ImageBo>>(){}.getType());
+    }
+
+    @Override
+    public Boolean update(ImageUpdateIbo ibo) {
+        return update(Image.builder().imagePath(ibo.getImagePath()).build()
+                , new QueryWrapper<Image>().setEntity(Image.builder().uid(ibo.getUid()).build()));
     }
 
 }

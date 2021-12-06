@@ -66,7 +66,7 @@ public class BlobManager implements IBlobManager {
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = {
             "Code_Sharing_Community_BlobManage_getBlobs",
-            "Code_Sharing_Community_BlobManager_getIndex"
+//            "Code_Sharing_Community_BlobManager_getIndex"
     }, allEntries = true)
     public Integer contribution(BlobInsertIbo ibo, CurrentUser currentUser) {
         SimpleBlobInsertIbo simpleBlobInsertIbo = modelMapper.map(ibo, SimpleBlobInsertIbo.class);
@@ -82,8 +82,7 @@ public class BlobManager implements IBlobManager {
                 });
 
                 if(webLabelControlService.saveBatch(list)) {
-                    afterContribution(blob);
-                    return blob.getId();
+                    return afterContribution(blob);
                 }
             } else {
                 return afterContribution(blob);
@@ -132,33 +131,16 @@ public class BlobManager implements IBlobManager {
         Map<Integer, CurrentUser> users = userInformationService.listByUids(uids).stream()
                 .collect(Collectors.toMap(CurrentUser :: getUid, CurrentUser :: context));
         Map<Integer, String> userImages = imageService.listImageByUids(uids).stream()
-                .collect(Collectors.toMap(ImageBo::getUid, ImageBo::getImagePath));
+                .collect(Collectors.toMap(ImageBo :: getUid, ImageBo :: getImagePath));
         List<SimpleBlobBo> blobs = modelMapper.map(page.getRecords(), new TypeToken<List<SimpleBlobBo>>(){}.getType());
 
-        List<SimpleBlobIndexBo> list = new ArrayList<>();
-
-        // 填充 Index Blob
-        blobs.forEach(blob -> {
-            SimpleBlobIndexBo index = new SimpleBlobIndexBo();
-
-            index.setBlob(blob);
-
-            CurrentUser currentUser = users.get(blob.getUid());
-            currentUser.setImgPath(userImages.get(blob.getUid()));
-
-            index.setUser(currentUser);
-
-            list.add(index);
+        // 设置用户头像
+        users.keySet().forEach(key -> {
+            CurrentUser currentUser = users.get(key);
+            currentUser.setImgPath(userImages.get(currentUser.getUid()));
         });
 
-        fillBlobInformation(webIds, list);
-
-        PageTemplateBo<SimpleBlobIndexBo> lastPage = new PageTemplateBo<>();
-
-        lastPage.init(page);
-        lastPage.setRecords(list);
-
-        return lastPage;
+        return fillPageInformation(webIds, blobs, page, users);
     }
 
     @Override
@@ -173,7 +155,7 @@ public class BlobManager implements IBlobManager {
         // 默认访问角色
         if(currentUser == null) {
             currentUser = new CurrentUser();
-            currentUser.setUid(181360226);
+            currentUser.setUid(0);
         }
 
         // 添加访问记录
@@ -184,12 +166,21 @@ public class BlobManager implements IBlobManager {
         Map<Integer, Integer> collections = collectionService.countByWebIds(webIds);
         Map<Integer, Integer> visits = visitInformationService.countByWebIds(webIds);
         Map<Integer, Integer> thumbs = webThumbsService.countByWebIds(webIds);
+        // 如果为 uid 为 0 则为默认访问角色, 认为为游客
+        Boolean thumbsStatus = currentUser.getUid().equals(0) ?
+                false : webThumbsService.isExist(ThumbsSearchIbo.builder().uid(currentUser.getUid()).webId(webId).build());
+        Boolean collectionStatus = currentUser.getUid().equals(0) ?
+                false : collectionService.isExist(CollectionSearchIbo.builder().uid(currentUser.getUid()).wid(webId).build());
+
+
 
         BlobInformationBo blobInformationBo = modelMapper.map(webInformation, BlobInformationBo.class);
 
         blobInformationBo.setCollection(collections.get(webId));
         blobInformationBo.setThumbs(thumbs.get(webId));
         blobInformationBo.setVisit(visits.get(webId));
+        blobInformationBo.setCollectionStatus(collectionStatus);
+        blobInformationBo.setThumbsStatus(thumbsStatus);
         blobInformationBo.setData(new String(webInformation.getWebData(), StandardCharsets.UTF_8));
 
         return blobInformationBo;
@@ -198,14 +189,15 @@ public class BlobManager implements IBlobManager {
     @Override
     @CacheEvict(value = {
             "Code_Sharing_Community_UserManger_getFans",
+            "Code_Sharing_Community_BlobManager_getCollection"
     }, allEntries = true)
     public ReversalBo reversal(ReversalStatusIbo ibo, CurrentUser currentUser) {
-        Assert.isTrue(webInformationService.isExistById(ibo.getWebId()), StatusEnum.NOT_FOUND);
-
         ReversalBo reversalBo = new ReversalBo();
 
         switch (ibo.getType()) {
             case "thumbs":
+                Assert.isTrue(webInformationService.isExistById(ibo.getWebId()), StatusEnum.NOT_FOUND);
+
                 return webThumbsService.isExist(modelMapper.map(ibo, ThumbsSearchIbo.class)
                         , searchIbo ->  {
                             Assert.isTrue(webThumbsService.remove(modelMapper.map(searchIbo
@@ -226,6 +218,8 @@ public class BlobManager implements IBlobManager {
                             return reversalBo;
                         });
             case "collection":
+                Assert.isTrue(webInformationService.isExistById(ibo.getWebId()), StatusEnum.NOT_FOUND);
+
                 return collectionService.isExist(CollectionSearchIbo.builder()
                         .wid(ibo.getWebId()).bid(ibo.getBid()).build()
                         , searchIbo -> {
@@ -248,6 +242,8 @@ public class BlobManager implements IBlobManager {
                            return reversalBo;
                         });
             case "like":
+                Assert.isTrue(userInformationService.isExist(UserSearchIbo.builder().uid(ibo.getLikeId()).build()), StatusEnum.NOT_FOUND);
+
                 return likeService.isExist(LikeSearchIbo.builder()
                         .likeId(ibo.getLikeId())
                         .uid(currentUser.getUid())
@@ -300,12 +296,9 @@ public class BlobManager implements IBlobManager {
     @Override
     @Cacheable(value = "Code_Sharing_Community_BlobManage_getBlobs", key = "#ibo")
     public PageTemplateBo<SimpleUserBlobBo> getBlobs(UserBlobSearchIbo ibo) {
-        Page<WebInformation> page;
+        Page<WebInformation> page = webInformationService.page(modelMapper.map(ibo, BlobSearchIbo.class));
 
-        ibo.setSize(10);
-        page = webInformationService.page(modelMapper.map(ibo, BlobSearchIbo.class));
-
-        Assert.isFalse(page.getRecords().size() == 0, StatusEnum.NOT_FOUND);
+        Assert.isFalse(page.getRecords().isEmpty(), StatusEnum.NOT_FOUND);
 
         List<Integer> webIds = new ArrayList<>();
 
@@ -315,24 +308,7 @@ public class BlobManager implements IBlobManager {
 
         List<SimpleBlobBo> blobs = modelMapper.map(page.getRecords(), new TypeToken<List<SimpleBlobBo>>(){}.getType());
 
-        List<SimpleUserBlobBo> list = new ArrayList<>();
-
-        // 填充 Index Blob
-        blobs.forEach(blob -> {
-            SimpleUserBlobBo index = SimpleUserBlobBo.builder()
-                    .blob(blob)
-                    .build();
-            list.add(index);
-        });
-
-        fillBlobInformation(webIds, list);
-
-        PageTemplateBo<SimpleUserBlobBo> lastPage = new PageTemplateBo<>();
-
-        lastPage.init(page);
-        lastPage.setRecords(list);
-
-        return lastPage;
+        return fillPageInformation(webIds, blobs, page, new HashMap<>());
     }
 
     @Override
@@ -340,6 +316,7 @@ public class BlobManager implements IBlobManager {
             "Code_Sharing_Community_BlobManage_getBlobs",
             "Code_Sharing_Community_WebInformationService_page"
         }, allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
     public Boolean deleteBlob(Integer id, CurrentUser currentUser) {
         WebInformation web = webInformationService.getById(id);
 
@@ -353,4 +330,74 @@ public class BlobManager implements IBlobManager {
 
         return webInformationService.removeById(id);
     }
+
+    @Cacheable(value = "Code_Sharing_Community_BlobManager_getCollection", key = "#ibo")
+    @Override
+    public PageTemplateBo<SimpleUserBlobBo> getCollection(UserBlobSearchIbo ibo) {
+        Page<Collection> page = collectionService.page(modelMapper.map(ibo, CollectionSearchIbo.class));
+
+        Assert.isFalse(page.getRecords().isEmpty(), StatusEnum.NOT_FOUND);
+
+        List<Integer> webIds = new ArrayList<>();
+        List<Integer> uids = new ArrayList<>();
+
+        page.getRecords().forEach(e -> {
+            webIds.add(e.getWid());
+            uids.add(e.getBid());
+        });
+
+        List<SimpleBlobBo> webList = modelMapper.map(webInformationService.listByIds(webIds)
+                , new TypeToken<List<SimpleBlobBo>>(){}.getType());
+        Map<Integer, CurrentUser> users = userInformationService.listByUids(uids).stream()
+                .collect(Collectors.toMap(CurrentUser :: getUid, CurrentUser :: context));
+
+        return fillPageInformation(webIds, webList, page, users);
+    }
+
+    /**
+     * 对分页信息进行填充
+     * @param webIds 文章id
+     * @param webList 文章集合
+     * @param page 分页信息
+     * @param users 博客的作者信息, 为empty 则代表不需要作者信息
+     * @return
+     *  pageTemplate
+     */
+    @SuppressWarnings("all")
+    private <T extends SimpleUserBlobBo> PageTemplateBo<T> fillPageInformation(List<Integer> webIds
+            , List<SimpleBlobBo> webList, Page<?> page, Map<Integer, CurrentUser> users) {
+        List<T> list = new ArrayList<>();
+
+        // 填充 Index Blob
+        webList.forEach(blob -> {
+            T t;
+
+            if(!users.isEmpty()) {
+                SimpleBlobIndexBo index = new SimpleBlobIndexBo();
+
+                index.setUser(users.get(blob.getUid()));
+                index.setBlob(blob);
+
+                t = (T) index;
+            } else {
+                SimpleUserBlobBo index = SimpleUserBlobBo.builder()
+                        .blob(blob)
+                        .build();
+
+                t = (T) index;
+            }
+
+            list.add(t);
+        });
+
+        fillBlobInformation(webIds, list);
+
+        PageTemplateBo<T> lastPage = new PageTemplateBo<>();
+
+        lastPage.init(page);
+        lastPage.setRecords(list);
+
+        return lastPage;
+    }
+
 }

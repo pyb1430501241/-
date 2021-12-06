@@ -1,17 +1,13 @@
 package com.pdsu.banmeng.config;
 
-import com.pdsu.banmeng.utils.HttpUtils;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.time.Duration;
+import java.util.Arrays;
 
 /**
  * @author 半梦
@@ -20,21 +16,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class CorsConfig {
+    /**
+     * 跨域
+     */
+    @Bean
+    public CorsConfiguration buildConfig() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("http://localhost:8080");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS"));
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setMaxAge(Duration.ofMinutes(30));
+        return corsConfiguration;
+    }
 
     @Bean
-    public WebMvcConfigurer webMvcConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")	// 允许跨域访问的路径
-                        .allowedOrigins("http://localhost:8080")	// 允许跨域访问的源
-                        .allowedMethods("GET", "POST", "OPTIONS")
-                        .maxAge(60)	// 预检间隔时间
-                        .allowedHeaders("authorization") // 允许头部设置
-                        .exposedHeaders()
-                        .allowCredentials(Boolean.TRUE);	// 是否发送cookie
-            }
-        };
+    public CorsFilter corsFilter(CorsConfiguration configuration) {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); //注册
+        return new CorsFilter(source);
     }
 
 }
