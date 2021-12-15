@@ -2,10 +2,7 @@ package com.pdsu.banmeng.manager;
 
 import com.pdsu.banmeng.bo.*;
 import com.pdsu.banmeng.context.CurrentUser;
-import com.pdsu.banmeng.ibo.BlobInsertIbo;
-import com.pdsu.banmeng.ibo.BlobSearchIbo;
-import com.pdsu.banmeng.ibo.ReversalStatusIbo;
-import com.pdsu.banmeng.ibo.UserBlobSearchIbo;
+import com.pdsu.banmeng.ibo.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,10 +21,17 @@ public interface IBlobManager {
      * @return
      * 发布成功 返回 id,
      * 失败返回 -1
-     *
      */
     Integer contribution(BlobInsertIbo ibo, CurrentUser currentUser);
 
+    /**
+     * 发布文章
+     * @param ibo 信息
+     * @return
+     * 发布成功 返回 id,
+     * 失败返回 -1
+     */
+    Integer update(BlobUpdateIbo ibo, CurrentUser currentUser);
 
     /**
      * 获取博客首页数据

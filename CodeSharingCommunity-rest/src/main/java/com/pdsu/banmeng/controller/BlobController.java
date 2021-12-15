@@ -78,6 +78,14 @@ public class BlobController {
                 modelMapper.map(vo, BlobInsertIbo.class), RequestContext.currentUser()));
     }
 
+    @PostMapping("/update")
+    @ApiOperation(value = "修改文章")
+    @User
+    public SimpleResponse<Integer> update(@Valid @RequestBody BlobInsertVo vo) {
+        return new SimpleResponse<>(blobManager.update(
+                modelMapper.map(vo, BlobUpdateIbo.class), RequestContext.currentUser()));
+    }
+
     @PostMapping("/index")
     @ApiOperation(value = "博客首页")
     @Tourist

@@ -4,6 +4,8 @@ import com.pdsu.banmeng.bo.WebLabelBo;
 import com.pdsu.banmeng.entity.WebLabelControl;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pdsu.banmeng.ibo.BlobSearchIbo;
+import com.pdsu.banmeng.ibo.LabelDeleteIbo;
+import com.pdsu.banmeng.ibo.LabelSearchIbo;
 
 import java.util.List;
 
@@ -25,4 +27,17 @@ public interface IWebLabelControlService extends IService<WebLabelControl> {
      */
     List<Integer> getWebIdsById(BlobSearchIbo ibo);
 
+    /**
+     * 根据文章ID 获取其对应的LabelIds
+     * @param ibo
+     * @return
+     */
+    List<Integer> getLabelIds(LabelSearchIbo ibo);
+
+    /**
+     * 删除标签
+     * @param ibo
+     * @return
+     */
+    boolean remove(LabelDeleteIbo ibo);
 }

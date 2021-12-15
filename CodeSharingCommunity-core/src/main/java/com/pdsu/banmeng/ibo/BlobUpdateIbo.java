@@ -5,21 +5,27 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * @author 半梦
  * @email 1430501241@qq.com
- * @since 2021-12-05 21:04
+ * @since 2021-12-15 16:20
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class UserUpdateIbo {
+public class BlobUpdateIbo {
 
-    private Integer uid;
+    private Integer id;
 
-    private String username;
+    private String title;
 
-    private String password;
+    private Integer type;
+
+    private String data;
+
+    private List<Integer> labelIds;
 
 }

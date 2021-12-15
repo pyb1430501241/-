@@ -1,4 +1,4 @@
-debug: true
+debug: false
 
 server:
   port: 80
@@ -35,7 +35,7 @@ spring:
       connection-test-query: SELECT 1
       username: root
       password: pyb***20000112
-      jdbc-url: jdbc:mysql://localhost:3306/code_sharing_community?useSSL=false&serverTimezone=UTC
+      jdbc-url: jdbc:mysql://localhost:3306/code_sharing_community?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       driver-class-name: com.mysql.cj.jdbc.Driver
   cache:
     type: redis
@@ -72,7 +72,7 @@ zuul:
     CodeSharingCommunityRest:
       path: /**
       service-id: CodeSharingCommunityRest
-  ignored-patterns: /login, /logout, /nav, /applyCode, /applyAccount, /image, /update
+  ignored-patterns: /login, /logout, /nav, /applyCode, /applyAccount, /image, /update, /changePasswordCode, /retrieve
 info:
   app.name: CodeSharingCommunity_路由网关_01
   company.name: www.halfdream.cn/半梦的个人网址

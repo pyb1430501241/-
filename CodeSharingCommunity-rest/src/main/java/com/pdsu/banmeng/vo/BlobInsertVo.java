@@ -21,6 +21,8 @@ import java.util.List;
 @Data
 public class BlobInsertVo {
 
+    private Integer id;
+
     @NotBlank
     private String title;
 

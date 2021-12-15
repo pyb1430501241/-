@@ -30,6 +30,14 @@ public interface IUserInformationService extends IService<UserInformation> {
     boolean isExist(UserSearchIbo searchIbo);
 
     /**
+     * 获取单个用户
+     * @param searchIbo 存在条件
+     * @return
+     * 是否
+     */
+    CurrentUser getOne(UserSearchIbo searchIbo);
+
+    /**
      * 添加用户信息
      * @param applyAccountIbo 用户信息
      * @param after 添加完成后执行

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.pdsu.banmeng.ibo.BlobInsertIbo;
 import com.pdsu.banmeng.ibo.BlobSearchIbo;
 import com.pdsu.banmeng.ibo.SimpleBlobInsertIbo;
+import com.pdsu.banmeng.ibo.SimpleBlobUpdateIbo;
 
 import java.util.List;
 import java.util.function.Function;
@@ -30,6 +31,15 @@ public interface IWebInformationService extends IService<WebInformation> {
      * 文章id
      */
     Integer insert(SimpleBlobInsertIbo ibo, Function<WebInformation, Integer> after);
+
+    /**
+     * 更新一篇文章
+     * @param ibo 文章信息
+     * @param after 插入成功后的操作
+     * @return
+     * 文章id
+     */
+    Integer update(SimpleBlobUpdateIbo ibo, Function<WebInformation, Integer> after);
 
     /**
      * 根据条件获取分页的博客

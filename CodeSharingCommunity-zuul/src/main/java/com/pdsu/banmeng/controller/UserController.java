@@ -14,10 +14,7 @@ import com.pdsu.banmeng.manager.impl.UserManager;
 import com.pdsu.banmeng.service.IEmailService;
 import com.pdsu.banmeng.service.IUserInformationService;
 import com.pdsu.banmeng.utils.*;
-import com.pdsu.banmeng.vo.ApplyAccountVo;
-import com.pdsu.banmeng.vo.ApplyCodeVo;
-import com.pdsu.banmeng.vo.LoginVo;
-import com.pdsu.banmeng.vo.UserUpdateVo;
+import com.pdsu.banmeng.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +49,8 @@ public class UserController {
     private static final long CODE_EXIST_TIME = DateUtils.NEWS_TIME_MINUTE * 5;
 
     private static final String APPLY_CODE_PREFIX = "apply:code:";
+
+    private static final String CHANGE_PASSWORD_CODE_PREFIX = "change:code:";
 
     @Autowired
     private ModelMapper modelMapper;
@@ -164,6 +163,29 @@ public class UserController {
         return new SimpleResponse<>(currentUser);
     }
 
+    @PostMapping("/changePasswordCode")
+    @ApiOperation("获取修改密码验证码")
+    @Tourist
+    public SimpleResponse<String> sendEmailBeforeChangePassword(@RequestBody CodeBeforeChangePasswordVo vo) throws EmailException {
+        String email = RedisUtils.get(vo.getToken());
+
+        Assert.nonNull(email, StatusEnum.EMAIL_TOKEN_ALREADY_TIMOUT);
+
+        return new SimpleResponse<>(sendEmail(CHANGE_PASSWORD_CODE_PREFIX, email, vo.getUsername()));
+    }
+
+    @PostMapping("/retrieve")
+    @ApiOperation("修改密码")
+    @Tourist
+    public SimpleResponse<Boolean> changePassword(@RequestBody ChangePasswordVo vo) {
+        checkCode(CHANGE_PASSWORD_CODE_PREFIX + vo.getToken(), vo.getCode());
+
+        String newPassword = HashUtils.md5(vo.getUid() + "", vo.getPassword());
+        vo.setPassword(newPassword);
+
+        return new SimpleResponse<>(userInformationService.update(modelMapper.map(vo, UserUpdateIbo.class)));
+    }
+
     /**
      * 校验验证码
      * @param key 存储在redis 的 key
@@ -192,7 +214,15 @@ public class UserController {
     @NonNull
     private String sendEmail(String prefix, String email, String name) throws EmailException {
         EmailHelper helper = new EmailHelper();
-        helper.sendEmailForApply(email, name);
+
+        switch (prefix) {
+            case APPLY_CODE_PREFIX:
+                helper.sendEmailForApply(email, name);
+                break;
+            case CHANGE_PASSWORD_CODE_PREFIX:
+                helper.sendEmailForModify(email, name);
+                break;
+        }
 
         String code = helper.getText();
         String token = RandomUtils.getUUID();

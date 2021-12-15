@@ -25,7 +25,9 @@ public enum StatusEnum {
     USER_IMAGE_ADD_ERROR(557, "添加头像信息失败"),
     USER_ROLE_ADD_ERROR(558, "分配用户权限失败"),
     USER_EMAIL_ADD_ERROR(559, "添加用户邮箱失败"),
+    USER_NOT_FOUND(559, "用户不存在"),
     BLOB_ADD_ERROR(600, "发布博客失败"),
+    BLOB_UPDATE_ERROR(602, "更新博客失败"),
     BLOB_LABEL_ADD_ERROR(601, "更新博客标签失败"),
     UNKNOWN_REVERSAL_TYPE(700, "未知的反转类型"),
     REVERSAL_ERROR(801, "请稍后重试"),
@@ -34,6 +36,9 @@ public enum StatusEnum {
     FILE_DOWNLOAD_ERROR(903, "文件下载失败"),
     FILE_SIZE_TOO_LARGE(904, "文件超出限制, 请自行压缩后上传"),
     FILE_ALREADY_EXIST(905, "不可上传同名文件, 请更换名称"),
+    FILE_NOT_FOUND(906, "文件未找到"),
+    FILE_NOT_SUPPORT_DOWNLOAD(907, "文件暂不支持下载, 请稍后重试"),
+    EMAIL_TOKEN_ALREADY_TIMOUT(955, "验证已过期, 请重新验证"),
     NOT_FOUND(404, "未找到");
 
     private Integer code;

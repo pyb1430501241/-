@@ -1,4 +1,4 @@
-package com.pdsu.banmeng.ibo;
+package com.pdsu.banmeng.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,18 +8,16 @@ import lombok.NoArgsConstructor;
 /**
  * @author 半梦
  * @email 1430501241@qq.com
- * @since 2021-12-05 21:04
+ * @since 2021-12-15 20:16
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class UserUpdateIbo {
+public class CodeBeforeChangePasswordVo {
 
-    private Integer uid;
+    private String token;
 
     private String username;
-
-    private String password;
 
 }

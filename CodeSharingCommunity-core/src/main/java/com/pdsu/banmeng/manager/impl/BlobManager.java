@@ -35,6 +35,8 @@ public class BlobManager implements IBlobManager {
 
     private static final Integer INDEX = 0;
 
+    private static final Integer TOURIST = 0;
+
     @Autowired
     private ModelMapper modelMapper;
 
@@ -62,6 +64,9 @@ public class BlobManager implements IBlobManager {
     @Autowired
     private ILikeService likeService;
 
+    @Autowired
+    private IWebLabelService webLabelService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = {
@@ -74,23 +79,53 @@ public class BlobManager implements IBlobManager {
 
         return webInformationService.insert(simpleBlobInsertIbo, blob -> {
 
-            if(ibo.getLabelIds().size() != 0) {
-                List<WebLabelControl> list = new ArrayList<>();
+            putLabel(ibo.getLabelIds(), blob.getId());
 
-                ibo.getLabelIds().forEach(e -> {
-                    list.add(WebLabelControl.builder().lid(e).wid(blob.getId()).build());
-                });
+            return afterContribution(blob);
+        });
 
-                if(webLabelControlService.saveBatch(list)) {
-                    return afterContribution(blob);
-                }
-            } else {
+    }
+
+    /**
+     * 设置文章标签
+     * @param labelIds 标签id
+     * @param id 文章id
+     */
+    private void putLabel(List<Integer> labelIds, Integer id) {
+        if(labelIds.size() != 0) {
+            List<WebLabelControl> list = new ArrayList<>();
+
+            labelIds.forEach(e -> {
+                list.add(WebLabelControl.builder().lid(e).wid(id).build());
+            });
+
+            if(webLabelControlService.saveBatch(list)) {
+                return;
+            }
+        } else {
+            return;
+        }
+
+        throw new BusinessException(StatusEnum.BLOB_ADD_ERROR);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer update(BlobUpdateIbo ibo, CurrentUser currentUser) {
+        Assert.isTrue(webInformationService.isExistById(ibo.getId()), StatusEnum.NOT_FOUND);
+
+        SimpleBlobUpdateIbo updateIbo = modelMapper.map(ibo, SimpleBlobUpdateIbo.class);
+        updateIbo.setUid(currentUser.getUid());
+
+        return webInformationService.update(updateIbo, blob -> {
+            if(webLabelControlService.remove(LabelDeleteIbo.builder().wid(blob.getId()).build())) {
+                putLabel(ibo.getLabelIds(), blob.getId());
+
                 return afterContribution(blob);
             }
 
-            throw new BusinessException(StatusEnum.BLOB_ADD_ERROR);
+            throw new BusinessException(StatusEnum.BLOB_LABEL_ADD_ERROR);
         });
-
     }
 
     /**
@@ -152,10 +187,10 @@ public class BlobManager implements IBlobManager {
 
         WebInformation webInformation = webInformationService.getById(webId);
 
-        // 默认访问角色
+        // 默认访问角色 为游客
         if(currentUser == null) {
             currentUser = new CurrentUser();
-            currentUser.setUid(0);
+            currentUser.setUid(TOURIST);
         }
 
         // 添加访问记录
@@ -163,16 +198,21 @@ public class BlobManager implements IBlobManager {
                 .builder().wid(webId).sid(webInformation.getUid())
                 .vid(currentUser.getUid()).build());
 
+        // 获取点赞收藏浏览量
         Map<Integer, Integer> collections = collectionService.countByWebIds(webIds);
         Map<Integer, Integer> visits = visitInformationService.countByWebIds(webIds);
         Map<Integer, Integer> thumbs = webThumbsService.countByWebIds(webIds);
+
+        // 获取文章标签
+        List<Integer> labelIds = webLabelControlService.getLabelIds(LabelSearchIbo.builder().wid(webId).build());
+
+        List<WebLabelBo> labels = labelIds.isEmpty() ? Collections.emptyList() : webLabelService.listsByIds(labelIds);
+
         // 如果为 uid 为 0 则为默认访问角色, 认为为游客
-        Boolean thumbsStatus = currentUser.getUid().equals(0) ?
+        Boolean thumbsStatus = currentUser.getUid().equals(TOURIST) ?
                 false : webThumbsService.isExist(ThumbsSearchIbo.builder().uid(currentUser.getUid()).webId(webId).build());
-        Boolean collectionStatus = currentUser.getUid().equals(0) ?
+        Boolean collectionStatus = currentUser.getUid().equals(TOURIST) ?
                 false : collectionService.isExist(CollectionSearchIbo.builder().uid(currentUser.getUid()).wid(webId).build());
-
-
 
         BlobInformationBo blobInformationBo = modelMapper.map(webInformation, BlobInformationBo.class);
 
@@ -182,6 +222,8 @@ public class BlobManager implements IBlobManager {
         blobInformationBo.setCollectionStatus(collectionStatus);
         blobInformationBo.setThumbsStatus(thumbsStatus);
         blobInformationBo.setData(new String(webInformation.getWebData(), StandardCharsets.UTF_8));
+        blobInformationBo.setLabels(labels);
+        blobInformationBo.setEditable(currentUser.getUid().equals(webInformation.getUid()));
 
         return blobInformationBo;
     }

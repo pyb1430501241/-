@@ -1,5 +1,6 @@
 package com.pdsu.banmeng.bo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 半梦
@@ -40,5 +42,9 @@ public class BlobInformationBo implements Serializable {
     private Boolean thumbsStatus;
 
     private Boolean collectionStatus;
+
+    private Boolean editable;
+
+    private List<WebLabelBo> labels;
 
 }

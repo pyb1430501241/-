@@ -10,7 +10,7 @@ import com.pdsu.banmeng.enums.StatusEnum;
 import com.pdsu.banmeng.ibo.*;
 import com.pdsu.banmeng.manager.IUserManager;
 import com.pdsu.banmeng.service.*;
-import com.pdsu.banmeng.utils.Assert;
+import com.pdsu.banmeng.utils.*;
 import org.apache.tomcat.util.http.fileupload.RequestContext;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -205,6 +205,26 @@ public class UserManager implements IUserManager {
 
         return imageService.update(ImageUpdateIbo.builder()
                 .imagePath(imageName).uid(currentUser.getUid()).build());
+    }
+
+    @Override
+    public ChangePasswordBeforeBo checkEmailBeforeChangePassword(UserSearchIbo ibo) {
+        Assert.isTrue(userInformationService.isExist(ibo), StatusEnum.USER_NOT_FOUND);
+
+        EmailBo email = emailService.getEmailByUid(modelMapper.map(ibo, EmailSearchIbo.class));
+        CurrentUser user = userInformationService.getOne(ibo);
+
+        String encryptionEmail = EmailUtils.encryptionEmail(email.getEmail());
+
+        String token = RandomUtils.getUUID();
+        RedisUtils.set(token, email.getEmail(), DateUtils.NEWS_TIME_MINUTE * 5);
+
+        return ChangePasswordBeforeBo.builder()
+                .uid(user.getUid())
+                .username(user.getUsername())
+                .email(encryptionEmail)
+                .token(token)
+                .build();
     }
 
 }

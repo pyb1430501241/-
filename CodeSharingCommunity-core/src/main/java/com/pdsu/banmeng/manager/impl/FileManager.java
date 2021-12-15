@@ -1,6 +1,8 @@
 package com.pdsu.banmeng.manager.impl;
 
+import com.pdsu.banmeng.bo.DownloadBo;
 import com.pdsu.banmeng.context.CurrentUser;
+import com.pdsu.banmeng.entity.FileDownload;
 import com.pdsu.banmeng.entity.WebFile;
 import com.pdsu.banmeng.enums.FileTypeEnum;
 import com.pdsu.banmeng.enums.StatusEnum;
@@ -11,11 +13,14 @@ import com.pdsu.banmeng.service.IFileDownloadService;
 import com.pdsu.banmeng.service.IFileStorageService;
 import com.pdsu.banmeng.service.IWebFileService;
 import com.pdsu.banmeng.utils.Assert;
+import com.pdsu.banmeng.utils.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +44,7 @@ public class FileManager implements IFileManager {
     @Autowired
     private ModelMapper modelMapper;
 
-    private ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10, 200, TimeUnit.MILLISECONDS,
+    private Executor executor = new ThreadPoolExecutor(5, 10, 200, TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue<>(5));
 
     @Override
@@ -65,5 +70,31 @@ public class FileManager implements IFileManager {
         return id;
     }
 
+    @Override
+    public DownloadBo download(Integer id, CurrentUser currentUser) {
+        WebFile file = webFileService.getById(id);
+
+        Assert.nonNull(file, StatusEnum.FILE_NOT_FOUND);
+
+        // 防止用户发布文件后立即下载, 文件还未保存的情况, 即路径不存在
+        Assert.nonNull(file.getFilePath(), StatusEnum.FILE_NOT_SUPPORT_DOWNLOAD);
+
+        Resource resource = fileStorageService.load(file.getFilePath(), FileTypeEnum.FILE);
+
+        fileDownloadService.save(FileDownload.builder()
+                // 上传者uid
+                .bid(file.getUid())
+                .fileId(id)
+                // 下载者 uid
+                .uid(181360226)
+//                .uid(currentUser.getUid())
+                .build());
+
+        DownloadBo downloadBo = new DownloadBo();
+        downloadBo.setResource(resource);
+        downloadBo.setFileName(file.getTitle() + FileUtils.getSuffix(file.getFilePath()));
+
+        return downloadBo;
+    }
 
 }

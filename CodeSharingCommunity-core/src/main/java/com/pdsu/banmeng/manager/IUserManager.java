@@ -1,11 +1,13 @@
 package com.pdsu.banmeng.manager;
 
 import com.pdsu.banmeng.bo.AuthorBo;
+import com.pdsu.banmeng.bo.ChangePasswordBeforeBo;
 import com.pdsu.banmeng.bo.FansInformationBo;
 import com.pdsu.banmeng.bo.PageTemplateBo;
 import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.ibo.ApplyAccountIbo;
 import com.pdsu.banmeng.ibo.LikeSearchIbo;
+import com.pdsu.banmeng.ibo.UserSearchIbo;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -46,4 +48,11 @@ public interface IUserManager {
      */
     Boolean updateUserImage(MultipartFile file, CurrentUser currentUser);
 
+    /**
+     * 根据条件查看邮箱
+     * @param ibo 条件
+     * @return
+     * 邮箱 加密后的
+     */
+    ChangePasswordBeforeBo checkEmailBeforeChangePassword(UserSearchIbo ibo);
 }

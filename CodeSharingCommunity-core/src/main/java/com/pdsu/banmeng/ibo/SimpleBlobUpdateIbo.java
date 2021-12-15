@@ -8,18 +8,22 @@ import lombok.NoArgsConstructor;
 /**
  * @author 半梦
  * @email 1430501241@qq.com
- * @since 2021-12-05 21:04
+ * @since 2021-12-15 16:22
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class UserUpdateIbo {
+public class SimpleBlobUpdateIbo {
+
+    private Integer id;
 
     private Integer uid;
 
-    private String username;
+    private String title;
 
-    private String password;
+    private Integer type;
+
+    private String data;
 
 }

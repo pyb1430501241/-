@@ -42,6 +42,11 @@ public class UserInformationServiceImpl extends ServiceImpl<UserInformationMappe
                 .setEntity(modelMapper.map(searchIbo, UserInformation.class))) != 0;
     }
 
+    @Override
+    public CurrentUser getOne(UserSearchIbo searchIbo) {
+        return modelMapper.map(getOne(new QueryWrapper<UserInformation>()
+                .setEntity(modelMapper.map(searchIbo, UserInformation.class))), CurrentUser.class);
+    }
 
     @Override
     public boolean applyAccount(ApplyAccountIbo applyAccountIbo, Function<UserInformation, Boolean> after) {

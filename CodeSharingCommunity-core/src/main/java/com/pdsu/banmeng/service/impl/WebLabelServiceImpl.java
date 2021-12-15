@@ -33,4 +33,9 @@ public class WebLabelServiceImpl extends ServiceImpl<WebLabelMapper, WebLabel> i
         return modelMapper.map(list(), new TypeToken<List<WebLabelBo>>(){}.getType());
     }
 
+    @Override
+    public List<WebLabelBo> listsByIds(List<Integer> ids) {
+        return modelMapper.map(listByIds(ids), new TypeToken<List<WebLabelBo>>(){}.getType());
+    }
+
 }

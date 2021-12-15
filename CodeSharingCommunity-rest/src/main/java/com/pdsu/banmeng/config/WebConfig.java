@@ -29,8 +29,8 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/user/image/**").addResourceLocations("file:E:/codeSharingCommunity/user/image/");
-        registry.addResourceHandler("/blob/image/**").addResourceLocations("file:E:/codeSharingCommunity/blob/image/");
+        registry.addResourceHandler("/user/image/**").addResourceLocations("file:/codeSharingCommunity/user/image/");
+        registry.addResourceHandler("/blob/image/**").addResourceLocations("file:/codeSharingCommunity/blob/image/");
     }
 
 }

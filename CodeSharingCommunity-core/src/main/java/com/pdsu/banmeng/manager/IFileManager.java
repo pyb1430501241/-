@@ -1,5 +1,6 @@
 package com.pdsu.banmeng.manager;
 
+import com.pdsu.banmeng.bo.DownloadBo;
 import com.pdsu.banmeng.context.CurrentUser;
 import com.pdsu.banmeng.ibo.FileInsertIbo;
 
@@ -17,5 +18,7 @@ public interface IFileManager {
      * 文件id
      */
     Integer insert(FileInsertIbo ibo, CurrentUser currentUser);
+
+    DownloadBo download(Integer id, CurrentUser currentUser);
 
 }

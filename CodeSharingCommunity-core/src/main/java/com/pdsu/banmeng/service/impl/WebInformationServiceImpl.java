@@ -8,6 +8,7 @@ import com.pdsu.banmeng.exception.BusinessException;
 import com.pdsu.banmeng.ibo.BlobInsertIbo;
 import com.pdsu.banmeng.ibo.BlobSearchIbo;
 import com.pdsu.banmeng.ibo.SimpleBlobInsertIbo;
+import com.pdsu.banmeng.ibo.SimpleBlobUpdateIbo;
 import com.pdsu.banmeng.mapper.WebInformationMapper;
 import com.pdsu.banmeng.service.IWebInformationService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -47,6 +48,20 @@ public class WebInformationServiceImpl extends ServiceImpl<WebInformationMapper,
         }
 
         throw new BusinessException(StatusEnum.BLOB_ADD_ERROR);
+    }
+
+    @Override
+    public Integer update(SimpleBlobUpdateIbo ibo, Function<WebInformation, Integer> after) {
+        WebInformation webInformation = modelMapper.map(ibo, WebInformation.class);
+        webInformation.setWebData(ibo.getData().getBytes(StandardCharsets.UTF_8));
+
+        boolean update = updateById(webInformation);
+
+        if(update) {
+            return after.apply(webInformation);
+        }
+
+        throw new BusinessException(StatusEnum.BLOB_UPDATE_ERROR);
     }
 
     @Override

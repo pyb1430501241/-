@@ -1,14 +1,17 @@
 package com.pdsu.banmeng.controller;
 
 import com.pdsu.banmeng.bo.AuthorBo;
+import com.pdsu.banmeng.bo.ChangePasswordBeforeBo;
 import com.pdsu.banmeng.bo.FansInformationBo;
 import com.pdsu.banmeng.bo.PageTemplateBo;
 import com.pdsu.banmeng.business.Tourist;
 import com.pdsu.banmeng.context.RequestContext;
 import com.pdsu.banmeng.dto.SimpleResponse;
 import com.pdsu.banmeng.ibo.LikeSearchIbo;
+import com.pdsu.banmeng.ibo.UserSearchIbo;
 import com.pdsu.banmeng.manager.IUserManager;
 import com.pdsu.banmeng.service.IEmailService;
+import com.pdsu.banmeng.service.IUserInformationService;
 import com.pdsu.banmeng.vo.FansSearchVo;
 import com.pdsu.banmeng.vo.FollowSearchVo;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +37,9 @@ public class UserController {
     @Autowired
     private IUserManager userManager;
 
+    @Autowired
+    private IUserInformationService userInformationService;
+
     @GetMapping("/author")
     @ApiOperation("获取用户信息")
     @Tourist
@@ -55,6 +61,14 @@ public class UserController {
     public SimpleResponse<PageTemplateBo<FansInformationBo>> getFollow(@RequestBody FollowSearchVo vo) {
         return new SimpleResponse<>(userManager.getFansOrFollow(modelMapper.map(vo, LikeSearchIbo.class)
                 , RequestContext.currentUser()));
+    }
+
+    @GetMapping("/exist")
+    @ApiOperation("用户是否存在")
+    @Tourist
+    public SimpleResponse<ChangePasswordBeforeBo> checkEmailBeforeChangePassword(Integer uid) {
+        return new SimpleResponse<>(userManager
+                .checkEmailBeforeChangePassword(UserSearchIbo.builder().uid(uid).build()));
     }
 
 }
